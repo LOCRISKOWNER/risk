@@ -1,323 +1,533 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Forecasts of AI Loss-of-Control Risk</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="A compilation of published probability estimates of AI catastrophe and extinction, coloured by source type and flagged by mechanism: misalignment, mixed, or undetermined.">
+<html lang="en"><head><meta charset="utf-8">
+<title>RSI Misalignment Chain</title>
+<meta name="description" content="An adjustable model of the chance that a misaligned superintelligent AI causes a catastrophe by 2031."><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: single reading column (~720px) in the style of an academic blog post; chart and tables may run wider, each scrolls inside its own box */
-:root{
-  --bg:#fbfcfd; --surface:#f1f4f7; --ink:#15202b; --muted:#5a6775; --rule:#d9e0e7;
-  --mis:#2456a6; --mixed:#7a4f9e; --und:#b26a00; --und-bg:#fff4e0; --mis-bg:#e8effa; --mixed-bg:#f2eaf8;
-  --t-ai:#0072B2; --t-lab:#D55E00; --t-sf:#009E73; --t-fc:#CC79A7; --t-other:#6b7785;
-  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
-  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+/* Layout: sticky result band over one analytical column; a fast/slow attrition funnel, staged inputs for each branch, a sensitivity tornado, then the formula. */
+:root {
+  --bg: #f3f5f6;
+  --surface: #ffffff;
+  --ink: #18242c;
+  --muted: #5b6a73;
+  --rule: #d5dde1;
+  --accent: #1f5f6b;
+  --slow: #7fa9b1;
+  --risk: #a3322a;
+  --track: #e2e8eb;
+  --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f151b; --surface:#18212a; --ink:#e6ebf0; --muted:#98a5b3; --rule:#2a3540;
-  --mis:#7aa7f0; --mixed:#c39be6; --und:#f0a940; --und-bg:#3a2a10; --mis-bg:#1a2a44; --mixed-bg:#2c2038; --t-ai:#56B4E9; --t-lab:#F28E4B; --t-sf:#2DCDA0; --t-fc:#E39BC2; --t-other:#9aa7b5; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f151b; --surface:#18212a; --ink:#e6ebf0; --muted:#98a5b3; --rule:#2a3540;
-  --mis:#7aa7f0; --mixed:#c39be6; --und:#f0a940; --und-bg:#3a2a10; --mis-bg:#1a2a44; --mixed-bg:#2c2038; --t-ai:#56B4E9; --t-lab:#F28E4B; --t-sf:#2DCDA0; --t-fc:#E39BC2; --t-other:#9aa7b5; color-scheme:dark}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
-.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-.wide{max-width:1080px;margin:0 auto;width:100%}
-h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;line-height:1.2;margin:0}
-h1{font-size:2.3rem}
-h2{font-size:1.6rem;margin-top:28px;padding-top:16px;border-top:1px solid var(--rule)}
-h3{font-size:1.15rem;margin-top:10px}
-p{margin:0}
-a{color:var(--mis)}
-.meta{display:flex;flex-wrap:wrap;gap:6px 24px;font-size:.85rem;color:var(--muted)}
-.meta b{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
-.box{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;font-size:.88rem}
-.box ul{margin:6px 0 0;padding-left:18px}
-.badge{display:inline-block;font-family:var(--f-mono);font-size:.68rem;font-weight:500;padding:2px 7px;border-radius:999px;white-space:nowrap;letter-spacing:.02em}
-.b-mis{background:var(--surface);color:var(--ink);border:1px solid var(--ink)}
-.b-mixed{background:var(--surface);color:var(--ink);border:1px dashed var(--ink)}
-.b-und{background:var(--und-bg);color:var(--und);border:1px solid var(--und)}
-ol.findings{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
-/* chart */
-figure{margin:0}
-.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.85rem;margin-bottom:8px}
-.controls button{font:inherit;font-size:.82rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);padding:5px 12px;border-radius:999px;cursor:pointer}
-.controls button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.controls button:focus-visible{outline:2px solid var(--mis);outline-offset:2px}
-.chartbox{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--bg)}
-svg#chart{display:block;width:100%;min-width:640px;height:auto}
-svg text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.8rem;color:var(--muted);margin-top:8px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend button{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:.8rem;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:4px 11px;cursor:pointer}
-.legend button[aria-pressed="false"]{opacity:.45}
-.legend button:focus-visible{outline:2px solid var(--mis);outline-offset:2px}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:baseline}
-.sq{border-radius:2px}
-.srcc{white-space:nowrap}
-.srcc small{display:block;color:var(--muted);font-size:.72rem;margin-left:16px}
-.rowcount{font-size:.82rem;color:var(--muted);max-width:760px;margin:6px auto 0}
-figcaption{font-size:.82rem;color:var(--muted);margin-top:8px}
-#tip{position:fixed;pointer-events:none;max-width:320px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;font-size:.8rem;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:20}
-#tip b{font-family:var(--f-mono)}
-/* tables */
-.tablebox{overflow-x:auto;border-top:2px solid var(--ink)}
-table{border-collapse:collapse;width:100%;font-size:.84rem;min-width:1020px}
-th{text-align:left;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--rule)}
-td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
-td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:500}
-td.date{white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
-td q{font-style:italic}
-td .note{display:block;color:var(--muted);font-size:.78rem;margin-top:3px}
-tr.dim{display:none}
-.bib{font-size:.85rem;padding-left:20px;display:flex;flex-direction:column;gap:4px;margin:0}
-.bib a{word-break:break-word}
-@media (max-width:520px){h1{font-size:1.8rem}body{font-size:15px}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-</head>
-<body>
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11181c; --surface: #19232a; --ink: #e4eaed; --muted: #94a3ab; --rule: #2c3a42;
+    --accent: #6fb3bf; --slow: #3f6c75; --risk: #ef7a6c; --track: #26333a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11181c; --surface: #19232a; --ink: #e4eaed; --muted: #94a3ab; --rule: #2c3a42;
+  --accent: #6fb3bf; --slow: #3f6c75; --risk: #ef7a6c; --track: #26333a; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.intro { padding-block: 28px 18px; }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: clamp(1.6rem, 4.5vw, 2.2rem); line-height: 1.15; margin: 0 0 8px; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0; max-width: 62ch; }
+.eyebrow { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 
+.band { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-block: 1px solid var(--rule); }
+.band .wrap { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px 20px; align-items: end; padding-block: 12px; }
+.res .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 500; line-height: 1; }
+.res.main .num { font-size: clamp(1.9rem, 7vw, 2.7rem); color: var(--risk); }
+.res.side .num { font-size: clamp(1.2rem, 4.5vw, 1.6rem); color: var(--ink); }
+.res .def { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.res .split { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.presets { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+@media (max-width: 560px) { .band .wrap { grid-template-columns: 1fr 1fr; } .res.main { grid-column: 1 / -1; } }
+
+button { font: inherit; font-size: 13px; cursor: pointer; border-radius: 4px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink); padding: 5px 10px; }
+button:hover { border-color: var(--accent); }
+button[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main { display: grid; gap: 30px; padding-block: 24px 48px; }
+section { display: grid; gap: 14px; }
+.head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 6px; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; margin: 0; }
+.tag { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.note { color: var(--muted); font-size: 14px; margin: 0; max-width: 64ch; }
+
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.funnel { display: grid; gap: 10px; }
+.frow { display: grid; grid-template-columns: minmax(0, 13rem) 1fr; gap: 12px; align-items: center; }
+.frow .lbl { font-size: 13.5px; font-weight: 500; }
+.frow .bars { display: grid; gap: 3px; }
+.b { display: grid; grid-template-columns: 1fr 3.8rem; gap: 8px; align-items: center; }
+.b .t { height: 12px; background: var(--track); border-radius: 2px; position: relative; }
+.b .f { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
+.b.fast .f { background: var(--accent); }
+.b.slow .f { background: var(--slow); }
+.b.tot .f { background: var(--risk); }
+.b span { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 12.5px; color: var(--muted); text-align: right; }
+@media (max-width: 480px) { .frow { grid-template-columns: 1fr; gap: 4px; } }
+
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px 28px; }
+.param { display: grid; gap: 2px; min-width: 0; }
+.param .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.param label { font-weight: 500; font-size: 14px; }
+.param output { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 14px; color: var(--accent); min-width: 3.5ch; text-align: right; }
+.param .help { font-size: 12.5px; color: var(--muted); }
+.about { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 20px; display: grid; gap: 16px; }
+.about .head { border-bottom: 1px solid var(--rule); }
+.about p { margin: 0; max-width: 66ch; }
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px 32px; }
+.about-grid > div { min-width: 0; display: grid; gap: 8px; align-content: start; }
+dl.defs { margin: 0; display: grid; gap: 10px; font-size: 14px; }
+dl.defs dt { font-weight: 600; }
+dl.defs dd { margin: 0; color: var(--muted); }
+ol.steps { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; font-size: 14px; }
+.about .caveat { font-size: 14px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; max-width: none; }
+.about .caveat > span { display: block; max-width: 66ch; }
+.caveat strong { color: var(--ink); }
+.plabel { font-size: 12px; color: var(--muted); align-self: center; margin-right: 2px; }
+input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0; }
+.toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+#slowParams[hidden] { display: none; }
+#slowParams.off { opacity: .45; }
+
+.tabs { display: flex; gap: 6px; }
+.tornado { display: grid; gap: 6px; }
+.trow, .axis { display: grid; grid-template-columns: minmax(0, 12rem) 1fr 6.5rem; gap: 10px; align-items: center; font-size: 13px; }
+.trow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trow .bar { position: relative; height: 14px; background: var(--track); border-radius: 2px; }
+.trow .seg { position: absolute; top: 0; bottom: 0; background: var(--accent); opacity: .85; border-radius: 2px; }
+.trow .mid { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+.trow .rng { font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; font-size: 12px; }
+.axis { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.axis .ticks { display: flex; justify-content: space-between; }
+@media (max-width: 480px) { .trow, .axis { grid-template-columns: minmax(0, 7.5rem) 1fr 5.8rem; } }
+
+.mcctl { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px 28px; }
+.stats { overflow-x: auto; }
+table.st { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 560px; }
+table.st th, table.st td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+table.st th:first-child, table.st td:first-child { text-align: left; padding-left: 0; }
+table.st th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+table.st td { font-family: var(--f-mono); font-size: 13px; }
+table.st td:first-child { font-family: var(--f-body); font-size: 13.5px; font-weight: 500; }
+.hist { width: 100%; height: auto; display: block; }
+.hist .bin { fill: var(--accent); opacity: .85; }
+.hist .ax { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+.hist .base { stroke: var(--rule); stroke-width: 1; }
+.hist .med { stroke: var(--ink); stroke-width: 2; }
+.hist .avg { stroke: var(--risk); stroke-width: 2; stroke-dasharray: 5 4; }
+.keyline { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 12.5px; color: var(--muted); }
+.keyline i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink); vertical-align: middle; margin-right: 6px; }
+.keyline i.d { border-top: 2px dashed var(--risk); }
+.rc .zero { position: absolute; top: -3px; bottom: -3px; left: 50%; width: 1px; background: var(--ink); }
+.method { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 18px; display: grid; gap: 10px; font-size: 14px; }
+.method pre { font-family: var(--f-mono); font-size: 12.5px; margin: 0; overflow-x: auto; line-height: 1.6; color: var(--ink); }
+.method p { margin: 0; color: var(--muted); max-width: 66ch; }
+.copyrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#copyMsg { font-size: 13px; color: var(--muted); }
+textarea#copyFallback { width: 100%; min-height: 8rem; font-family: var(--f-mono); font-size: 12px; background: var(--bg); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; padding: 8px; }
+</style>
 
 <div class="wrap">
-  <header style="display:flex;flex-direction:column;gap:12px">
-    <h1>Forecasts of AI Loss-of-Control &amp; Existential Risk</h1>
-    <div class="meta">
-      <div><b>Compiled</b>24 October 2026 · updated 25 October</div>
-      <div><b>Scope</b>Quantitative estimates, 2020–2026</div>
-      <div><b>Modelled on</b><a href="https://tecunningham.github.io/posts/2025-10-19-forecasts-of-AI-growth.html">Cunningham, Forecasts of AI &amp; Economic Growth</a></div>
-    </div>
+  <header class="intro">
+    <div class="eyebrow">AI misalignment risk model</div>
+    <h1>How likely is a catastrophe from misaligned AI by 2031?</h1>
+    <p class="lede">An adjustable model of the chance that a misaligned superintelligent AI causes a catastrophe by the end of 2031, if AI systems begin improving themselves within the next two years. It opens on a central estimate. Change any input to see how the answer moves.</p>
   </header>
-
-  <div class="box">
-    <strong>How the mechanism is classified.</strong> Each estimate gets one tag.
-    <ul>
-      <li><span class="badge b-mis">Misalignment / loss of control</span> the question or speaker specifies AI takeover, misaligned or power-seeking AI, or humans losing control of AI.</li>
-      <li><span class="badge b-mixed">Mixed</span> the source says explicitly that the number covers both misaligned AI and human misuse.</li>
-      <li><span class="badge b-und">⚠ Undetermined</span> labelled AI catastrophe, extinction or doom without saying whether misalignment or misuse is meant. Where context points one way, a note says so, but the tag stays.</li>
-    </ul>
-    <p style="margin-top:8px">Several figures come from secondary reports rather than the primary document; these are marked “via secondary report” in the table.</p>
-  </div>
 </div>
 
-<div class="wide" style="margin-top:24px">
-  <figure>
-    <div class="controls" role="group" aria-label="Filter by mechanism">
-      <span style="color:var(--muted)">Mechanism:</span>
-      <button type="button" id="f-all" data-f="all" aria-pressed="true">All estimates</button>
-      <button type="button" id="f-mis" data-f="mis" aria-pressed="false">Misalignment only</button>
-      <button type="button" id="f-und" data-f="und" aria-pressed="false">Undetermined only</button>
-      <button type="button" id="f-mixed" data-f="mixed" aria-pressed="false">Mixed only</button>
+<div class="band">
+  <div class="wrap">
+    <div class="res main"><div class="num" id="uncond">–</div><div class="def">Overall, including the chance that RSI happens at all</div></div>
+    <div class="res side"><div class="num" id="condLoose">–</div><div class="def">Chance of catastrophe by 2031, assuming RSI in next 2 years<br><span class="split" id="splitLine"></span></div></div>
+    <div class="res side"><div class="num" id="condMean">–</div><div class="def">Average across the uncertainty simulations, assuming RSI<br><span class="split" id="strictLine"></span></div></div>
+    <div class="presets" role="group" aria-label="Presets">
+      <span class="plabel">Start from:</span>
+      <button type="button" data-preset="optimist">Optimist</button>
+      <button type="button" data-preset="central" aria-pressed="true">Central</button>
+      <button type="button" data-preset="pessimist">Pessimist</button>
     </div>
-    <div class="chartbox"><svg id="chart" viewBox="0 0 960 470" role="img" aria-label="Scatter of AI catastrophe and loss-of-control probability estimates by date, log scale, coloured by source type"></svg></div>
-    <div class="legend" id="legend" role="group" aria-label="Show or hide source types"></div>
-    <div class="legend" style="margin-top:6px">
-      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--muted)"/></svg>Individual estimate</span>
-      <span><svg width="14" height="14"><rect x="2" y="2" width="10" height="10" fill="var(--muted)"/></svg>Survey / group median</span>
-      <span><svg width="14" height="14"><line x1="7" y1="1" x2="7" y2="13" stroke="var(--muted)" stroke-width="2"/></svg>Stated range</span>
+  </div>
+</div>
+
+<div class="wrap">
+<main>
+  <section class="about" aria-labelledby="aboutH">
+    <div class="head"><h2 id="aboutH">What this page shows</h2></div>
+    <p>Some researchers expect AI systems to start improving themselves soon, with each generation helping to build the next. If that happens, a key question is whether the resulting systems would pursue goals that differ from what their developers intended, and how likely that is to end in catastrophe. This model breaks the question into a chain of steps. Each step has a probability you can change, and the page multiplies them together.</p>
+    <div class="about-grid">
+      <div>
+        <div class="eyebrow">Key terms</div>
+        <dl class="defs">
+          <div><dt>RSI (recursive self-improvement)</dt><dd>AI systems doing much of the research that makes AI better, so progress feeds on itself.</dd></div>
+          <div><dt>Superintelligence</dt><dd>AI far more capable than humans at almost every intellectual task.</dd></div>
+          <div><dt>Fast and slow takeoff</dt><dd>Whether RSI leads to superintelligence within months (fast) or over years (slow). Fast takeoff leaves less time to notice and fix problems.</dd></div>
+          <div><dt>Misalignment</dt><dd>An AI developing goals that differ from what its developers intended, and acting to protect them from correction.</dd></div>
+          <div><dt>Scalable oversight</dt><dd>Methods that let humans, helped by AI, supervise and correct systems too capable to check directly.</dd></div>
+          <div><dt>Catastrophe</dt><dd>A misaligned AI causing at least a million deaths or comparable global harm. The strict definition counts only permanent loss of human control, or at least 10% of people killed.</dd></div>
+        </dl>
+      </div>
+      <div>
+        <div class="eyebrow">How to use it</div>
+        <ol class="steps">
+          <li>The large number at the top is the model's overall estimate of the chance of catastrophe by 2031, including the chance that RSI starts in the next two years at all. The figure beside it assumes RSI does start.</li>
+          <li>Choose a preset (Optimist, Central or Pessimist), or move any slider to set your own view.</li>
+          <li>The sections below show where the risk drops away along the chain, which inputs matter most, and how uncertain the result is.</li>
+        </ol>
+      </div>
     </div>
-    <figcaption>Probability (log scale) against the date the estimate was made. Colour shows who made the estimate; shape shows whether it is one person or a survey or group median. Click a legend entry to hide or show that source type. Hover or tap a point for the outcome, horizon and mechanism. Horizons differ a lot (next decade, 30 years, 2050, 2070, 2100, unbounded), so vertical comparisons are rough. Yudkowsky’s ~99.5% sits at the top edge. <strong>Source-type judgement calls:</strong> FRI’s sceptic group was nine superforecasters and two domain experts, and its concerned group was eleven domain experts. Samotsvety, Lifland and Metaculus are shown as other forecasters, not superforecasters. Hubinger works at Anthropic but is not a founder, so he is counted as an AI expert. Ord, Carlsmith and Alexander are “other”.</figcaption>
-  </figure>
+    <p class="caveat"><span><strong>Treat the numbers as illustrative.</strong> The default values are one person's judgement calls, not forecasts derived from data. Published expert estimates of AI catastrophe range from well under 1% to above 50%, depending on who is asked and how the question is defined. The model covers misalignment only, not misuse of AI by people or conflict between countries.</span></p>
+  </section>
+
+  <section>
+    <div class="head"><h2>Where the risk drops away</h2><span class="tag">cumulative, assuming RSI</span></div>
+    <p class="note">Read from top to bottom. Each row shows how much of the probability remains after that step, so the bars shrink as each step filters out the worlds where the problem is avoided.</p>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Fast takeoff</span><span><i style="background:var(--slow)"></i>Slow takeoff</span><span><i style="background:var(--risk)"></i>Total</span></div>
+    <div class="funnel" id="funnel"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Speed of takeoff</h2></div>
+    <p class="note">How quickly RSI leads to superintelligence. In the fast branch it takes months, leaving little time to notice and fix problems. The rest of the probability goes to the slow branch, where it takes years. The first slider only affects the overall figure, not the figure assuming RSI.</p>
+    <div class="params" data-group="takeoff"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Fast takeoff: misalignment and oversight</h2></div>
+    <p class="note">Whether advanced systems end up misaligned, and how much oversight techniques reduce that. Oversight is a relative cut: at 20%, a 50% chance of misalignment becomes 40%, not 30%.</p>
+    <div class="params" data-group="mis"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Fast takeoff: from misalignment to catastrophe</h2></div>
+    <p class="note">A misaligned system that is not corrected still has to pursue a catastrophic outcome, succeed against human responses, and do so before the end of 2031. Each is a separate judgement.</p>
+    <div class="params" data-group="end"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Slow takeoff</h2>
+      <label class="toggle"><input type="checkbox" id="slowOn" checked> Include slow takeoff in the total</label>
+    </div>
+    <p class="note">Worlds where RSI takes years, not months, to produce superintelligence. They have their own inputs because more time changes how well oversight works, how people respond, and whether harm lands before 2031. Untick the box to see the fast-takeoff figure on its own.</p>
+    <div class="params" id="slowParams" data-group="slow"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Which inputs matter most</h2>
+      <div class="tabs" role="group" aria-label="Basis for sensitivity">
+        <button type="button" data-sens="cond" aria-pressed="true">Assuming RSI</button>
+        <button type="button" data-sens="uncond">Overall</button>
+      </div>
+    </div>
+    <p class="note">Each bar shows how the total changes when that one input is moved 15 percentage points down and up from its current setting, with everything else held fixed. A longer bar means the result is more sensitive to that input. The black line marks the current total. "Overall" includes the chance that RSI happens at all.</p>
+    <div class="tornado" id="tornado"></div>
+    <div class="axis"><span></span><div class="ticks" id="ticks"></div><span></span></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>How uncertain is the result?</h2>
+      <div class="tabs" role="group" aria-label="Basis for the Monte Carlo charts">
+        <button type="button" data-mcb="cond" aria-pressed="true">Assuming RSI</button>
+        <button type="button" data-mcb="uncond" aria-pressed="false">Overall</button>
+      </div>
+    </div>
+    <p class="note">The sliders give one best guess for each input, but every one of them is uncertain. This simulation (a Monte Carlo analysis) treats each slider as the middle of a range of possible values, picks 10,000 random combinations, runs the model on each, and shows how widely the answers spread.</p>
+    <div class="mcctl">
+      <div class="param">
+        <div class="top"><label for="mcSigma">Spread of each input</label><output id="mcSigmaOut" for="mcSigma"></output></div>
+        <input type="range" id="mcSigma" min="0" max="2" step="0.1" value="1">
+        <div class="help" id="mcSigmaHelp"></div>
+      </div>
+      <div class="param">
+        <div class="top"><label for="mcRho">Shared "hard world" factor</label><output id="mcRhoOut" for="mcRho"></output></div>
+        <input type="range" id="mcRho" min="0" max="0.8" step="0.05" value="0.3">
+        <div class="help">Share of each input's variation that moves together: when alignment turns out hard, misalignment, pursuit, success and timing all tend to be high and oversight low. Zero treats every input as independent.</div>
+      </div>
+    </div>
+    <div class="stats"><table class="st" id="mcTable"></table></div>
+    <p class="note">P(&gt; 5%) is the share of simulations in which the chance of catastrophe comes out above 5%. The 80% range runs from the 10th to the 90th percentile of results.</p>
+    <p class="note">Each bar counts the simulations whose result falls in that range. The last bar also includes anything above the right-hand edge.</p>
+    <svg class="hist" id="hist" viewBox="0 0 640 200" role="img" aria-label="Histogram of simulated chances of catastrophe"></svg>
+    <div class="keyline"><span><i></i>Median (typical outcome)</span><span><i class="d"></i>Mean (average, pulled up by the high tail)</span><button type="button" id="mcSeedBtn">Re-run with a new random seed</button></div>
+    <div class="eyebrow">What drives the spread</div>
+    <p class="note">Each bar shows how closely an input's random values track the result. Right means higher values push the result up; left means they push it down. Inputs that tend to move together through the shared "hard world" factor all look important when that factor is high. Set it to zero to see each input on its own.</p>
+    <div class="tornado rc" id="rc"></div>
+    <div class="axis"><span></span><div class="ticks" id="rcTicks"></div><span></span></div>
+  </section>
+
+  <section class="method">
+    <div class="eyebrow">How the model works</div>
+<pre>fast = P(super in months) × misaligned × (1 − oversight)
+       × pursues × succeeds × by 2031
+slow = (1 − P(super in months)) × misaligned_slow × (1 − oversight_slow)
+       × pursues_slow × succeeds_slow × by 2031_slow
+
+assuming RSI  = fast + slow
+overall       = P(RSI in next 2 years) × assuming RSI
+strict        = assuming RSI × strict share</pre>
+    <p>The model covers misalignment only. It leaves out misuse of AI by people and conflict between countries, which would add to the total. The fast and slow branches cannot both happen, so their risks add without overlap.</p>
+    <p>The default values are judgement calls, not forecasts derived from data. Use the presets and sliders to see what you would need to believe to reach a different answer.</p>
+    <p>The uncertainty section draws each input from a logit-normal distribution centred on its slider, which keeps values between 0% and 100%, with a shared factor that moves the inputs together. The spread and the shared factor are also judgement calls, so the intervals show how the model's assumptions combine, not a calibrated forecast.</p>
+    <div class="copyrow">
+      <button type="button" id="copyBtn">Copy summary</button>
+      <span id="copyMsg" aria-live="polite"></span>
+    </div>
+    <textarea id="copyFallback" hidden readonly></textarea>
+  </section>
+</main>
 </div>
-
-<div class="wrap" style="margin-top:28px">
-  <p>I’ve collected published probabilities that AI causes human extinction, permanent disempowerment or a global catastrophe, focusing on risk from misaligned AI and loss of control. Where a number is labelled only as “AI extinction” or “AI catastrophe” I include it and flag that the mechanism is undetermined.</p>
-
-  <h3>What the collection shows</h3>
-  <ol class="findings">
-    <li><strong>Most headline numbers don’t specify misalignment.</strong> Of the figures most often quoted in policy settings (Hinton 10–20%, Amodei 10–25%, the XPT tournament, the FRI LEAP panel, the AI Impacts headline question), none separates loss of control from misuse. Only about a third of the estimates here are cleanly about misalignment.</li>
-    <li><strong>Where misalignment is specified, estimates cluster at 10–35%.</strong> Ord 10%, Carlsmith &gt;10%, Christiano 22% for takeover, Samotsvety 25%, Lifland 35%, Shlegeris 35% over ten years. AI researchers asked about “inability to control” give a median of 9–10%. The outliers are Yudkowsky (~99.5%) and the Conjecture staff survey (70%).</li>
-    <li><strong>Group disagreement spans two orders of magnitude.</strong> Superforecasters (0.38% AI extinction by 2100; 2.4% AI catastrophe by 2100 in 2026) and FRI’s sceptic group (0.1%; nine of its eleven members were superforecasters) sit far below AI safety researchers (25–35%). FRI’s own conditional questions suggest much of the gap is about how fast capabilities arrive: experts’ AI-catastrophe forecast for 2100 rises from 2% under slow progress to 10% under rapid progress.</li>
-    <li><strong>Question wording moves the answer about as much as time does.</strong> In the 2022 and 2023 AI Impacts surveys the narrower “inability to control” question got a <em>higher</em> median (10%) than the broader “AI advances causing extinction” question (5%), which is logically odd given the first is a subset. In the 2024 survey the order flipped (9% vs 10%).</li>
-    <li><strong>The researcher median has drifted up; forecaster numbers have not.</strong> The AI Impacts headline question doubled from 5% (2023) to 10% (fielded December 2024). FRI’s 2026 expert panel gives 5% for an AI catastrophe by 2100, below the 12% from XPT experts in 2022, though the panels differ.</li>
-  </ol>
-</div>
-
-<div class="wide" style="margin-top:28px">
-  <h2 style="max-width:760px;margin-left:auto;margin-right:auto">Quantitative estimates</h2>
-  <p class="rowcount" id="rowcount"></p>
-  <div class="tablebox" style="margin-top:12px">
-    <table id="tbl">
-      <thead><tr><th>Date made</th><th>Who</th><th>Source type</th><th>Estimate</th><th>Outcome &amp; horizon</th><th>Mechanism</th><th>Quote or paraphrase</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<div class="wrap" style="margin-top:28px">
-  <h2>Qualitative positions</h2>
-  <div class="tablebox">
-    <table style="min-width:640px">
-      <thead><tr><th>Date</th><th>Who</th><th>Position</th><th>Mechanism</th></tr></thead>
-      <tbody>
-        <tr><td class="date">Dec 2023</td><td>Yann LeCun</td><td>Compared the risk to an asteroid strike, without a number. The widely circulated “&lt;0.01%” was someone else’s gloss. In Oct 2026 said he was not worried about extinction at all.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
-        <tr><td class="date">Jul 2025</td><td>Demis Hassabis</td><td>Declined to give a number; said risk is <q>definitely non-zero and it’s probably non-negligible</q>.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
-        <tr><td class="date">Feb 2026</td><td>International AI Safety Report</td><td>No probability. Treats loss of control as a distinct risk category, says current systems cannot trigger it at civilisational scale, and records deep expert uncertainty about future scenarios.</td><td><span class="badge b-mis">Misalignment / loss of control</span></td></tr>
-        <tr><td class="date">May 2026</td><td>Yoshua Bengio</td><td>Now declines to restate his 2023 figure: <q>I’d rather stay out of the p(doom) game.</q></td><td><span class="badge b-mixed">Mixed</span></td></tr>
-        <tr><td class="date">Jul 2026</td><td>Elon Musk</td><td>Moved from “10% or 20%” (2024) to saying only that the risk is not zero.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
-        <tr><td class="date">Sep 2026</td><td>Jensen Huang</td><td>Gave 0% that AI ends the world by 2030.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h2>Notes on interpretation</h2>
-  <p><strong>Horizons.</strong> Ord’s figure is for this century, Carlsmith’s for 2070, the tournaments’ for 2100, Hinton’s for 30 years, Hubinger’s and Shlegeris’s for ten years, and many personal numbers have no horizon at all. A 10% figure over ten years implies far higher annual hazard than 10% by 2100.</p>
-  <p><strong>Outcome severity.</strong> “Extinction”, “existential catastrophe” (which includes permanent disempowerment and lock-in), and “catastrophe” (FRI: more than 10% of people die within five years) are different events. FRI’s XPT gives roughly a 5:1 ratio of AI catastrophe to AI extinction for superforecasters, and 4:1 for experts.</p>
-  <p><strong>Selection.</strong> Safety-researcher surveys (Bensinger 2021, Conjecture 2023, Summit on Existential Security 2026) select for concern; AI Impacts had a 10–17% response rate, though the authors report that respondents attentive and inattentive to the topic gave similar medians.</p>
-  <p><strong>Mixed figures.</strong> Bengio’s 20% explicitly includes humans turning AI against humanity. Christiano’s 46% “irreversibly messed up” includes takeover (22%) plus non-takeover paths. These are tagged mixed, not undetermined.</p>
-
-  <h2>Sources</h2>
-  <ol class="bib" id="bib"></ol>
-</div>
-
-<div id="tip" hidden></div>
 
 <script>
-// m: mis | mixed | und ; k: ind (individual) | grp (survey/forecast group)
-// d: decimal year when the estimate was made
-const D=[
-{id:"ord",d:2020.2,date:"Mar 2020",who:"Toby Ord, The Precipice",k:"ind",v:10,lab:"10% (1 in 10)",out:"Existential catastrophe from unaligned AI, next 100 years",m:"mis",q:"Rates “unaligned artificial intelligence” at 1 in 10 this century, his largest single risk.",src:"Ord on 80,000 Hours",url:"https://80000hours.org/podcast/episodes/toby-ord-the-precipice-existential-risk-future-humanity/"},
-{id:"carl21",d:2021.3,date:"Apr 2021",who:"Joe Carlsmith",k:"ind",v:5,lab:"~5%",out:"Existential catastrophe from power-seeking misaligned AI, by 2070",m:"mis",q:"Six-premise argument; original estimate ~5%.",src:"Carlsmith, Is Power-Seeking AI an Existential Risk?",url:"https://arxiv.org/abs/2206.13353"},
-{id:"carl22",d:2022.4,date:"May 2022",who:"Joe Carlsmith",k:"ind",v:10,lab:">10%",out:"Same question, by 2070",m:"mis",q:"“my estimate here has gone up, and is now at >10%”",src:"Carlsmith, Is Power-Seeking AI an Existential Risk? (May 2022 note)",url:"https://arxiv.org/abs/2206.13353",cite:"carl21"},
-{id:"bens",d:2021.42,date:"Jun 2021",who:"Bensinger survey, 44 AI safety researchers",k:"grp",v:30,lab:"30% (median)",out:"Future drastically worse because AI systems don’t do what deployers intended; no horizon",m:"mis",q:"Responses ranged from ~1% to ~99%; MIRI staff gave a 70% median.",src:"Bensinger, “Existential risk from AI” survey results",url:"https://www.alignmentforum.org/posts/QvwSr5LsxyDeaPK5s/existential-risk-from-ai-survey-results"},
-{id:"aii22c",d:2022.55,date:"Jul 2022",who:"AI Impacts 2022 survey, ML researchers (n≈162 on this item)",k:"grp",v:10,lab:"10% (median)",out:"“Human inability to control” advanced AI causing extinction or permanent disempowerment; no horizon",m:"mis",q:"“human inability to control future advanced AI systems”",src:"AI Impacts, 2022 Expert Survey on Progress in AI",url:"https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/"},
-{id:"aii22g",d:2022.55,date:"Jul 2022",who:"AI Impacts 2022 survey, ML researchers (n≈149)",k:"grp",v:5,lab:"5% (median)",out:"Future AI advances causing extinction or permanent disempowerment; no horizon",m:"und",q:"Broader version of the question; mechanism not specified.",src:"AI Impacts, 2022 Expert Survey on Progress in AI",url:"https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/",cite:"aii22c"},
-{id:"samo",d:2022.69,date:"Sep 2022",who:"Samotsvety forecasters (n=13)",k:"grp",v:25,lab:"25% (aggregate)",out:"Misaligned AI takeover by 2100",m:"mis",q:"“probability of misaligned AI takeover by 2100, barring pre-APS-AI catastrophe”",src:"Samotsvety’s AI risk forecasts",url:"https://samotsvety.org/blog/2022/09/09/samotsvety-s-ai-risk-forecasts/"},
-{id:"lif",d:2022.7,date:"Sep 2022",who:"Eli Lifland",k:"ind",v:35,lab:"35%",out:"AI takeover by 2100",m:"mis",q:"Gave 35% for AI takeover by 2100 in his review of What We Owe the Future.",src:"Lifland comment on Samotsvety’s AI risk forecasts",url:"https://www.greaterwrong.com/posts/YMsD7GA7eTg2BafQd/samotsvety-s-ai-risk-forecasts",sec:true},
-{id:"xptsx",d:2022.8,date:"Jun–Oct 2022",who:"XPT tournament, superforecasters",k:"grp",v:0.38,lab:"0.38% (median)",out:"AI-caused extinction (population <5,000) by 2100",m:"und",q:"Superforecasters gave 2.13% for an AI catastrophe (>10% die) by 2100.",src:"FRI, Forecasting Existential Risk (XPT)",url:"https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf"},
-{id:"xptex",d:2022.8,date:"Jun–Oct 2022",who:"XPT tournament, AI domain experts",k:"grp",v:3,lab:"3% (median)",out:"AI-caused extinction by 2100",m:"und",q:"Experts gave 12% for an AI catastrophe by 2100.",src:"FRI, Forecasting Existential Risk (XPT)",url:"https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf",cite:"xptsx"},
-{id:"scott",d:2023.2,date:"Mar 2023",who:"Scott Alexander",k:"ind",v:33,lab:"~33%",out:"Misaligned AI kills or disempowers humanity; no horizon",m:"mis",q:"“if you force me to give an estimate it’s probably around 33%”",src:"Astral Codex Ten, Why I Am Not (As Much Of) A Doomer",url:"https://www.astralcodexten.com/p/why-i-am-not-as-much-of-a-doomer"},
-{id:"conjc",d:2023.29,date:"Apr 2023",who:"Conjecture staff survey (n=23)",k:"grp",v:70,lab:"70% (median)",out:"Inability to control AI causing extinction or permanent disempowerment",m:"mis",q:"Mean 59%. Same loss-of-control wording as AI Impacts.",src:"Conjecture internal survey",url:"https://www.lesswrong.com/posts/kygEPBDrGGoM8rz9a/agi-timelines-and-estimations-of-probability-of-human"},
-{id:"conjg",d:2023.29,date:"Apr 2023",who:"Conjecture staff survey (n=23)",k:"grp",v:80,lab:"80% (median)",out:"AI causing extinction or permanent disempowerment, all causes",m:"mixed",q:"Question explicitly includes misalignment and misuse; mean 71%.",src:"Conjecture internal survey",url:"https://www.lesswrong.com/posts/kygEPBDrGGoM8rz9a/agi-timelines-and-estimations-of-probability-of-human",cite:"conjc"},
-{id:"chr22",d:2023.32,date:"Apr 2023",who:"Paul Christiano",k:"ind",v:22,lab:"22%",out:"AI takeover (15% from systems humans build, 7% later); no horizon",m:"mis",q:"“Probability of an AI takeover: 22%”",src:"Christiano, My views on “doom”",url:"https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom"},
-{id:"chr46",d:2023.32,date:"Apr 2023",who:"Paul Christiano",k:"ind",v:46,lab:"46%",out:"Humanity irreversibly messes up its future within 10 years of powerful AI",m:"mixed",q:"Sum of takeover (22%), non-takeover extinction (9%) and other failures.",src:"Christiano, My views on “doom”",url:"https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom",cite:"chr22"},
-{id:"aic23",d:2023.4,date:"Apr–May 2023",who:"FRI adversarial collaboration, AI domain experts (“concerned” group)",k:"grp",v:25,lab:"25% (median)",out:"Existential catastrophe due to AI by 2100",m:"und",q:"Eleven domain experts; 20% after debate. Their top cruxes were about alignment, but the question names no mechanism.",src:"FRI, Roots of Disagreement on AI Risk",url:"https://forum.effectivealtruism.org/posts/orhjaZ3AJMHzDzckZ/results-from-an-adversarial-collaboration-on-ai-risk-fri"},
-{id:"ais23",d:2023.4,date:"Apr–May 2023",who:"FRI adversarial collaboration, superforecasters (“sceptic” group)",k:"grp",v:0.1,lab:"0.10% (median)",out:"Existential catastrophe due to AI by 2100",m:"und",q:"Nine superforecasters and two domain experts; 0.12% after debate.",src:"FRI, Roots of Disagreement on AI Risk",url:"https://forum.effectivealtruism.org/posts/orhjaZ3AJMHzDzckZ/results-from-an-adversarial-collaboration-on-ai-risk-fri",cite:"aic23"},
-{id:"leike",d:2023.45,date:"2023",who:"Jan Leike",k:"ind",v:50,lo:10,hi:90,lab:"10–90%",out:"AI doom; no horizon",m:"und",q:"Gave a deliberately wide range in a 2023 interview.",src:"If Anyone Builds It: AI experts on catastrophe scenarios",url:"https://ifanyonebuildsit.com/intro/ai-experts-on-catastrophe-scenarios",sec:true},
-{id:"beng",d:2023.53,date:"Jul 2023",who:"Yoshua Bengio",k:"ind",v:20,lab:"~20%",out:"Catastrophe; no horizon",m:"mixed",q:"“I got around, like, 20 per cent probability that it turns out catastrophic.”",src:"ABC News (Australia), What’s your p(doom)?",url:"https://www.abc.net.au/news/2023-07-15/whats-your-pdoom-ai-researchers-worry-catastrophe/102591340",note:"Inputs explicitly included AI or humans turning the technology against humanity."},
-{id:"amo23",d:2023.78,date:"Oct 2023",who:"Dario Amodei",k:"ind",v:17.5,lo:10,hi:25,lab:"10–25%",out:"Civilisation-scale catastrophe; no horizon",m:"und",q:"“something goes really quite catastrophically wrong on the scale of human civilization”",src:"The Logan Bartlett Show, Oct 2023",url:"https://www.youtube.com/watch?v=gAaCqj6j5sQ&t=5895s"},
-{id:"hin23",d:2023.83,date:"Oct 2023",who:"Geoffrey Hinton",k:"ind",v:10,lab:"10%",out:"Extinction within 30 years if AI is not strongly regulated",m:"und",q:"“My current estimate is 0.1.”",src:"Hinton on X, 31 Oct 2023",url:"https://x.com/geoffreyhinton/status/1719447980753719543",sec:true},
-{id:"aii23c",d:2023.8,date:"Oct 2023",who:"AI Impacts 2023 survey (2,778 researchers)",k:"grp",v:10,lab:"10% (median)",out:"Inability to control AI causing extinction or permanent disempowerment",m:"mis",q:"Loss-of-control variant; headline question got 5% (mean 16.2%).",src:"Grace et al., Thousands of AI Authors on the Future of AI",url:"https://arxiv.org/abs/2401.02843",sec:true},
-{id:"aii23g",d:2023.8,date:"Oct 2023",who:"AI Impacts 2023 survey (2,778 researchers)",k:"grp",v:5,lab:"5% (median)",out:"Future AI advances causing extinction or permanent disempowerment",m:"und",q:"“future AI advances causing human extinction or similarly permanent and severe disempowerment”",src:"Grace et al., Thousands of AI Authors on the Future of AI",url:"https://arxiv.org/abs/2401.02843",cite:"aii23c"},
-{id:"musk",d:2024.2,date:"Mar 2024",who:"Elon Musk",k:"ind",v:15,lo:10,hi:20,lab:"10–20%",out:"AI ending humanity; no horizon",m:"und",q:"“10% or 20% or something like that”",src:"Musk at Abundance360, Mar 2024",url:"https://www.youtube.com/watch?v=akXMYvKjUxM&t=95s",sec:true},
-{id:"kok24",d:2024.43,date:"Jun 2024",who:"Daniel Kokotajlo",k:"ind",v:70,lab:"~70%",out:"AI destroys or catastrophically harms humanity; no horizon",m:"und",q:"Told the New York Times the chance AI wrecks humanity is around 70%.",src:"Futurism, OpenAI insider estimates 70 percent chance",url:"https://futurism.com/openai-insider-70-percent-doom",sec:true,note:"His AI 2027 scenario’s bad ending is misaligned AI, but the 70% itself names no mechanism."},
-{id:"hin24",d:2024.98,date:"Dec 2024",who:"Geoffrey Hinton",k:"ind",v:15,lo:10,hi:20,lab:"10–20%",out:"AI leads to human extinction within 30 years",m:"und",q:"Asked if his 10% had changed: “Not really, 10 to 20 percent.”",src:"BBC Radio 4 Today, reported by Der Standard",url:"https://www.derstandard.at/story/3000000251128/geoffrey-hinton-beziffert-risiko-neu-dass-uns-ki-ausrotten-wird",sec:true,note:"Spoke in the same interview about AI evading human control."},
-{id:"aii24g",d:2024.95,date:"Dec 2024",who:"AI Impacts 2024 survey (1,580 researchers)",k:"grp",v:10,lab:"10% (median)",out:"Future AI advances causing extinction or permanent disempowerment",m:"und",q:"Mean 18.3%. First time this question’s median reached 10%. Published Sep 2026.",src:"AI Impacts, Advanced AI according to 1,580 researchers (ESPAI 2024)",url:"https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf",sec:true},
-{id:"aii24c",d:2024.95,date:"Dec 2024",who:"AI Impacts 2024 survey (1,580 researchers)",k:"grp",v:9,lab:"9% (median)",out:"Inability to control AI causing extinction or permanent disempowerment",m:"mis",q:"Loss-of-control variant, slightly below the headline question this time.",src:"AI Impacts, ESPAI 2024",url:"https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf",sec:true,cite:"aii24g"},
-{id:"hin25",d:2025.3,date:"Apr 2025",who:"Geoffrey Hinton",k:"ind",v:15,lo:10,hi:20,lab:"10–20%",out:"AI eventually takes control from humans",m:"mis",q:"Framed as AI that would “take over from humans”.",src:"PPC Land, report of CBS interview",url:"https://ppc.land/ai-pioneer-warns-of-superintelligence-takeover-within-next-two-decades/",sec:true},
-{id:"amo25",d:2025.71,date:"Sep 2025",who:"Dario Amodei",k:"ind",v:25,lab:"25%",out:"Things go “really, really badly”; no horizon",m:"und",q:"“There’s a 25% chance that things go really, really badly”",src:"Axios AI+ DC Summit",url:"https://www.axios.com/2025/09/17/anthropic-dario-amodei-p-doom-25-percent"},
-{id:"yud",d:2025.72,date:"Sep 2025",who:"Eliezer Yudkowsky",k:"ind",v:99.5,lab:"~99.5%",out:"Superintelligence built with current techniques kills everyone",m:"mis",q:"Told Kevin Roose there was a 99.5% chance AI would kill him.",src:"NYT profile (Roose), reprinted by DT Next",url:"https://www.dtnext.in/lifestyle/technology/doomsdai-846516",sec:true},
-{id:"alt",d:2025.8,date:"Oct 2025",who:"Sam Altman",k:"ind",v:2,lab:"~2%",out:"Human extinction; no horizon",m:"und",q:"“2%. Don’t take that as like a literal number I’ve calculated”",src:"MD MEETS interview, Oct 2025",url:"https://www.youtube.com/watch?v=rF0tQtDMwHM&t=1496s",sec:true},
-{id:"ses",d:2026.1,date:"Feb 2026",who:"Summit on Existential Security attendees (n=59)",k:"grp",v:25,lab:"25% (median)",out:"Human extinction or permanent disempowerment before 2100",m:"und",q:"Mean 34%. The question does not name AI or any mechanism.",src:"Survey of AI safety leaders (Feb 2026)",url:"https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and"},
-{id:"buck",d:2026.28,date:"Apr 2026",who:"Buck Shlegeris",k:"ind",v:35,lab:"~35%",out:"AI takeover within ten years",m:"mis",q:"“I think AI takeover in the next ten years is like 35%”",src:"Comment on the Summit survey post",url:"https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and"},
-{id:"l9ex",d:2026.42,date:"May–Jun 2026",who:"FRI LEAP wave 9, experts (AI domain experts)",k:"grp",v:5,lab:"5% (median)",out:"AI-caused catastrophe (>10% die within 5 years) by 2100",m:"und",q:"2% if progress is slow, 10% if rapid.",src:"FRI, Forecasting Major Risks from AI",url:"https://forecastingresearch.substack.com/p/forecasting-major-risks-from-ai",note:"Unconditional medians via secondary report; conditional figures from FRI."},
-{id:"l9sf",d:2026.42,date:"May–Jun 2026",who:"FRI LEAP wave 9, superforecasters",k:"grp",v:2.4,lab:"2.4% (median)",out:"AI-caused catastrophe by 2100",m:"und",q:"US public panel gave 7%.",src:"FRI, Forecasting Major Risks from AI",url:"https://forecastingresearch.substack.com/p/forecasting-major-risks-from-ai",sec:true,cite:"l9ex"},
-{id:"kok26",d:2026.53,date:"Jul 2026",who:"Daniel Kokotajlo",k:"ind",v:70,lab:"~70%",out:"Things go horribly wrong, e.g. extinction; no horizon",m:"und",q:"“something like 70% chance that this goes horribly wrong like human extinction”",src:"The Diary of a CEO, Jul 2026",url:"https://www.youtube.com/watch?v=_g4l7YkDQwA&t=2521s",sec:true},
-{id:"l12ex",d:2026.68,date:"Aug–Sep 2026",who:"FRI LEAP wave 12, experts (domain experts)",k:"grp",v:2,lab:"2% (median)",out:"AI-caused catastrophe by 2050",m:"und",q:"Unconditional, incl. expected policy. Superforecasters 1.6%, public 5%.",src:"FRI LEAP, Wave 12: Safety Policies",url:"https://leap.forecastingresearch.org/reports/wave12"},
-{id:"l12ar",d:2026.68,date:"Aug–Sep 2026",who:"FRI LEAP wave 12, AI risk experts",k:"grp",v:5.2,lab:"5.2% (median)",out:"AI-caused catastrophe by 2050",m:"und",q:"A minority of respondents focused on loss-of-control scenarios.",src:"FRI LEAP, Wave 12",url:"https://leap.forecastingresearch.org/reports/wave12",cite:"l12ex"},
-{id:"l12sf",d:2026.68,date:"Aug–Sep 2026",who:"FRI LEAP wave 12, superforecasters",k:"grp",v:1.6,lab:"1.6% (median)",out:"AI-caused catastrophe by 2050",m:"und",q:"Same question as above.",src:"FRI LEAP, Wave 12",url:"https://leap.forecastingresearch.org/reports/wave12",cite:"l12ex"},
-{id:"hub",d:2026.69,date:"Sep 2026",who:"Evan Hubinger (Anthropic)",k:"ind",v:10,lab:">10%",out:"AI kills all humans within ten years",m:"und",q:"“I personally think it is >10% within the next decade.”",src:"BBC News, Anthropic researcher believes more than 10% chance",url:"https://www.bbc.com/news/articles/ckgwy1k42w4o",note:"Follow-up posts point to superintelligence from recursive self-improvement and no plan to solve alignment."},
-{id:"hin26",d:2026.7,date:"Sep 2026",who:"Geoffrey Hinton",k:"ind",v:10,lab:"~10%",out:"AI kills all humans within a decade (interviewer’s framing)",m:"und",q:"Called 10% “not an unreasonable estimate”.",src:"BBC Newsnight, Sep 2026",url:"https://www.youtube.com/watch?v=IZMjJGi4YhI&t=46s",sec:true},
-{id:"meta",d:2026.72,date:"Sep 2026",who:"Metaculus community",k:"grp",v:10,lab:"~10%",out:"World closest to “Paperclipalypse” (AI drives humans extinct) by 2050",m:"mis",q:"Scenario defines AIs as opposed or indifferent to human existence.",src:"Metaculus, Which of Scott Aaronson’s five AI worlds",url:"https://play.metaculus.com/questions/20683/which-of-scott-aaronsons-five-ai-worlds-will-come-to-pass",sec:true}
+const PARAMS = [
+  { id: "rsi", g: "takeoff", name: "RSI starts in the next two years", help: "Chance that AI systems begin doing most of the research that improves AI, so progress feeds on itself", v: 0.60 },
+  { id: "isi", g: "takeoff", name: "Superintelligence within months", help: "If RSI happens, the chance that systems become far more capable than humans at almost everything within months (the fast-takeoff branch)", v: 0.80 },
+  { id: "mis", g: "mis", name: "Misalignment by default", help: "Without extra safeguards, the chance that advanced systems end up with goals that differ from what developers intended and that they would defend against correction", v: 0.50 },
+  { id: "ovs", g: "mis", name: "Scalable oversight", help: "How much oversight techniques (including AI-assisted alignment research) cut the chance of misalignment, as a relative reduction", v: 0.20 },
+  { id: "pur", g: "end", name: "Pursues catastrophic outcome", help: "If a system is misaligned and not corrected, the chance it takes actions that lead to catastrophe for humans rather than something milder", v: 0.35 },
+  { id: "suc", g: "end", name: "Succeeds against resistance", help: "If it pursues that outcome, the chance it succeeds despite human and institutional responses", v: 0.70 },
+  { id: "tim", g: "end", name: "Early enough, by 2031", help: "If it succeeds, the chance the catastrophe happens before the end of 2031", v: 0.70 },
+  { id: "str", g: "end", name: "Strict share", help: "Share of catastrophes that meet the strict definition: permanent loss of human control, or at least 10% of people killed. Only affects the strict figure", v: 0.85 },
+  { id: "misS", g: "slow", name: "Misalignment by default (slow)", help: "The same question as for fast takeoff, in worlds where takeoff takes years", v: 0.50, slow: true },
+  { id: "ovsS", g: "slow", name: "Oversight (slow)", help: "Relative reduction in risk from oversight. Higher than for fast takeoff because there is more time to detect and respond", v: 0.40, slow: true },
+  { id: "purS", g: "slow", name: "Pursues catastrophic outcome (slow)", help: "Lower than for fast takeoff if humans keep more ability to correct course", v: 0.30, slow: true },
+  { id: "sucS", g: "slow", name: "Succeeds against resistance (slow)", help: "More time for human and institutional responses to work", v: 0.55, slow: true },
+  { id: "timS", g: "slow", name: "Early enough, by 2031 (slow)", help: "A slower takeoff pushes catastrophes later, often beyond the window", v: 0.50, slow: true },
 ];
+const PRESETS = {
+  // Central: user's chosen central values
+  central: { rsi: 0.65, isi: 0.70, mis: 0.80, ovs: 0.10, pur: 0.40, suc: 0.80, tim: 0.70, str: 0.85, misS: 0.80, ovsS: 0.40, purS: 0.33, sucS: 0.55, timS: 0.55 },
+  optimist: { rsi: 0.40, isi: 0.65, mis: 0.35, ovs: 0.40, pur: 0.20, suc: 0.55, tim: 0.55, str: 0.80, misS: 0.35, ovsS: 0.55, purS: 0.15, sucS: 0.40, timS: 0.40 },
+  pessimist: { rsi: 0.75, isi: 0.90, mis: 0.70, ovs: 0.10, pur: 0.50, suc: 0.80, tim: 0.85, str: 0.90, misS: 0.70, ovsS: 0.25, purS: 0.50, sucS: 0.70, timS: 0.65 },
+};
+const state = { ...PRESETS.central };
+let slowOn = true;
+let sensMode = "cond";
+const pct = x => (x * 100 < 9.95 ? (x * 100).toFixed(1) : Math.round(x * 100)) + "%";
 
-// source type: ai = AI experts & researchers, lab = AI lab founders/CEOs, sf = superforecasters, fc = other forecasters, other
-const T={
- ai:["bens","aii22c","aii22g","conjc","conjg","chr22","chr46","aic23","xptex","leike","beng","hin23","hin24","hin25","hin26","aii23c","aii23g","aii24g","aii24c","kok24","kok26","yud","buck","hub","ses","l9ex","l12ex","l12ar"],
- lab:["amo23","amo25","alt","musk"],
- sf:["xptsx","ais23","l9sf","l12sf"],
- fc:["samo","lif","meta"],
- other:["ord","carl21","carl22","scott"]};
-const TY={ai:{n:"AI experts & researchers",s:"AI experts"},lab:{n:"AI lab founders / CEOs",s:"Lab founders"},sf:{n:"Superforecasters",s:"Superforecasters"},fc:{n:"Other forecasters",s:"Other forecasters"},other:{n:"Other (philosophers, commentators)",s:"Other"}};
-for(const t in T)T[t].forEach(id=>{const r=D.find(x=>x.id===id);r.t=t});
-if(D.some(r=>!r.t))console.error("untyped entries",D.filter(r=>!r.t).map(r=>r.id));
-// earlier restatements of the same estimate: still plotted, but folded into the latest table row
-const FOLD={carl21:"carl22",kok24:"kok26",hin23:"hin24",amo23:"amo25",aii22g:"aii24g",aii23g:"aii24g",aii22c:"aii24c",aii23c:"aii24c"};
-const HIST={carl22:"Earlier: ~5% (Apr 2021).",kok26:"Same figure in Jun 2024 (via Futurism).",hin24:"Earlier: 10% (Oct 2023).",amo25:"Earlier: 10–25% (Oct 2023).",aii24g:"Earlier survey waves: 5% (2022), 5% (2023).",aii24c:"Earlier survey waves: 10% (2022), 10% (2023)."};
-
-const NS="http://www.w3.org/2000/svg";
-const svg=document.getElementById("chart");
-const W=960,H=470,ml=70,mr=24,mt=24,mb=50;
-const x0=2020,x1=2027,yMin=0.05,yMax=100;
-const X=d=>ml+(d-x0)/(x1-x0)*(W-ml-mr);
-const Y=v=>{const l=Math.log10(Math.max(yMin,Math.min(yMax,v)));return mt+(Math.log10(yMax)-l)/(Math.log10(yMax)-Math.log10(yMin))*(H-mt-mb)};
-const mlab={mis:"Misalignment / loss of control",mixed:"Mixed",und:"⚠ Undetermined"};
-const mcls=m=>m==="mis"?"b-mis":m==="mixed"?"b-mixed":"b-und";
-const tcol=t=>`var(--t-${t})`;
-function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
-
-// grid + axes
-[0.1,0.3,1,3,10,30,100].forEach(v=>{el("line",{x1:ml,x2:W-mr,y1:Y(v),y2:Y(v),stroke:"var(--rule)","stroke-width":1});const t=el("text",{x:ml-8,y:Y(v)+4,"text-anchor":"end"});t.textContent=v+"%"});
-for(let yr=2020;yr<=2027;yr++){el("line",{x1:X(yr),x2:X(yr),y1:mt,y2:H-mb,stroke:"var(--rule)","stroke-width":1,"stroke-dasharray":"2 4"});const t=el("text",{x:X(yr),y:H-mb+20,"text-anchor":"middle"});t.textContent=yr}
-const yl=el("text",{x:16,y:(H-mb+mt)/2,"text-anchor":"middle",transform:`rotate(-90 16 ${(H-mb+mt)/2})`});yl.textContent="Probability (log scale)";
-const xl=el("text",{x:(W+ml)/2,y:H-8,"text-anchor":"middle"});xl.textContent="Date estimate was made";
-
-// jitter coincident points
-const seen={};
-const pts=D.map(r=>{const key=r.d.toFixed(2);const n=seen[key]=(seen[key]||0)+1;return {...r,px:X(r.d)+(n-1)*9-((n>1)?4:0)}});
-const tip=document.getElementById("tip");
-const groups=[];
-pts.forEach(r=>{
-  const g=el("g",{tabindex:"0","data-m":r.m,"data-t":r.t,style:"cursor:pointer;outline:none"});
-  const c=tcol(r.t);
-  if(r.lo!=null){el("line",{x1:r.px,x2:r.px,y1:Y(r.hi),y2:Y(r.lo),stroke:c,"stroke-width":2,opacity:.55},g);
-    [r.lo,r.hi].forEach(v=>el("line",{x1:r.px-4,x2:r.px+4,y1:Y(v),y2:Y(v),stroke:c,"stroke-width":2,opacity:.55},g))}
-  const y=Y(r.v),attrs={fill:c,stroke:"var(--bg)","stroke-width":1.2};
-  if(r.k==="grp")el("rect",{x:r.px-5.5,y:y-5.5,width:11,height:11,...attrs},g);
-  else el("circle",{cx:r.px,cy:y,r:6,...attrs},g);
-  const show=e=>{tip.innerHTML=`<b>${r.lab}</b> · ${r.who}<br>${r.out}<br><span style="display:inline-block;margin-top:6px"><span class="dot${r.k==="grp"?" sq":""}" style="background:${c}"></span>${TY[r.t].s} · ${r.k==="grp"?"survey / group median":"individual"}</span><br><span class="badge ${mcls(r.m)}" style="margin-top:6px">${mlab[r.m]}</span><br><span style="color:var(--muted)">${r.date} · ${r.src}</span>`;tip.hidden=false;place(e)};
-  g.addEventListener("mouseenter",show);g.addEventListener("mousemove",place);g.addEventListener("mouseleave",()=>tip.hidden=true);
-  g.addEventListener("focus",()=>{const b=g.getBoundingClientRect();show({clientX:b.right,clientY:b.top})});g.addEventListener("blur",()=>tip.hidden=true);
-  g.addEventListener("click",e=>{e.stopPropagation();show(e)});
-  groups.push(g);
-});
-document.addEventListener("click",()=>tip.hidden=true);
-function place(e){const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=Math.max(8,x)+"px";tip.style.top=Math.max(8,y)+"px"}
-
-// table: one row per estimate; earlier restatements folded into the latest row
-const tb=document.querySelector("#tbl tbody");
-const rows=[...D].filter(r=>!FOLD[r.id]).sort((a,b)=>a.d-b.d);
-rows.forEach(r=>{
-  const tr=document.createElement("tr");tr.dataset.m=r.m;tr.dataset.t=r.t;
-  const notes=[r.note,HIST[r.id]].filter(Boolean).map(n=>`<span class="note">${n}</span>`).join("");
-  tr.innerHTML=`<td class="date">${r.date}</td><td>${r.who}</td>
-  <td class="srcc"><span class="dot${r.k==="grp"?" sq":""}" style="background:${tcol(r.t)}"></span>${TY[r.t].s}<small>${r.k==="grp"?"survey / group median":"individual"}</small></td>
-  <td class="num">${r.lab}</td><td>${r.out}</td>
-  <td><span class="badge ${mcls(r.m)}">${mlab[r.m]}</span></td>
-  <td>${r.q}${notes}<span class="note"><a href="${r.url}" target="_blank" rel="noopener">${r.src}</a>${r.sec?" · via secondary report":""}</span></td>`;
-  tb.appendChild(tr);
-});
-document.getElementById("rowcount").textContent=`${rows.length} rows. The chart plots ${D.length} estimates: ${D.length-rows.length} earlier restatements of the same estimate (Carlsmith 2021, Kokotajlo 2024, Hinton 2023, Amodei 2023, and the 2022–23 AI Impacts survey waves) are plotted but folded into the latest row here.`;
-
-// filters: mechanism buttons + source-type legend toggles
-const state={m:"all",hide:new Set()};
-function apply(){
-  const ok=(m,t)=>(state.m==="all"||m===state.m)&&!state.hide.has(t);
-  groups.forEach(g=>g.style.opacity=ok(g.dataset.m,g.dataset.t)?1:.08);
-  tb.querySelectorAll("tr").forEach(tr=>tr.classList.toggle("dim",!ok(tr.dataset.m,tr.dataset.t)));
+function compute(s, withSlow = slowOn) {
+  const fast = [s.isi]; // stage values given RSI
+  fast.push(fast[0] * s.mis, fast[0] * s.mis * (1 - s.ovs));
+  fast.push(fast[2] * s.pur, fast[2] * s.pur * s.suc, fast[2] * s.pur * s.suc * s.tim);
+  const w = 1 - s.isi;
+  const slow = [w, w * s.misS, w * s.misS * (1 - s.ovsS)];
+  slow.push(slow[2] * s.purS, slow[2] * s.purS * s.sucS, slow[2] * s.purS * s.sucS * s.timS);
+  const f = fast[5], sl = withSlow ? slow[5] : 0;
+  const cond = f + sl;
+  return { fast, slow, f, sl, cond, uncond: cond * s.rsi, condStrict: cond * s.str };
 }
-const btns=[...document.querySelectorAll(".controls button")];
-btns.forEach(b=>b.addEventListener("click",()=>{state.m=b.dataset.f;btns.forEach(x=>x.setAttribute("aria-pressed",x===b));apply()}));
-const lg=document.getElementById("legend");
-Object.keys(TY).forEach(t=>{
-  const n=D.filter(r=>r.t===t).length;
-  const b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed","true");
-  b.innerHTML=`<svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="${tcol(t)}"/></svg>${TY[t].n} <span style="color:var(--muted)">(${n})</span>`;
-  b.addEventListener("click",()=>{state.hide.has(t)?state.hide.delete(t):state.hide.add(t);b.setAttribute("aria-pressed",!state.hide.has(t));apply()});
-  lg.appendChild(b);
+
+for (const p of PARAMS) {
+  const host = document.querySelector(`[data-group="${p.g}"]`);
+  const d = document.createElement("div");
+  d.className = "param" + (p.added ? " added" : "");
+  d.innerHTML = `<div class="top"><label for="in-${p.id}">${p.name}</label><output id="out-${p.id}" for="in-${p.id}"></output></div>
+    <input type="range" id="in-${p.id}" min="0" max="1" step="0.01" value="${state[p.id]}">
+    <div class="help">${p.help}</div>`;
+  host.appendChild(d);
+  d.querySelector("input").addEventListener("input", e => {
+    state[p.id] = parseFloat(e.target.value);
+    document.querySelectorAll("[data-preset]").forEach(b => b.setAttribute("aria-pressed", "false"));
+    render();
+  });
+}
+document.getElementById("slowOn").addEventListener("change", e => { slowOn = e.target.checked; render(); });
+
+function render() {
+  const r = compute(state);
+  document.getElementById("condLoose").textContent = pct(r.cond);
+  document.getElementById("uncond").textContent = pct(r.uncond);
+  document.getElementById("strictLine").textContent = "Strict only (sliders as set): " + pct(r.condStrict);
+  document.getElementById("splitLine").textContent = slowOn ? `Fast takeoff ${pct(r.f)} · Slow takeoff ${pct(r.sl)}` : `Fast takeoff only`;
+  document.getElementById("slowParams").classList.toggle("off", !slowOn);
+  for (const p of PARAMS) {
+    document.getElementById("out-" + p.id).textContent = Math.round(state[p.id] * 100) + "%";
+    const inp = document.getElementById("in-" + p.id);
+    if (parseFloat(inp.value) !== state[p.id]) inp.value = state[p.id];
+  }
+  renderFunnel(r);
+  renderTornado(r);
+  scheduleMC();
+}
+
+function renderFunnel(r) {
+  const labels = ["Takeoff speed (branch weight)", "Misaligned by default", "Still misaligned after oversight", "Pursues catastrophic outcome", "Succeeds", "Happens by 2031"];
+  const scale = Math.max(r.fast[0], slowOn ? r.slow[0] : 0, 0.05);
+  const bar = (cls, v) => `<div class="b ${cls}"><div class="t"><div class="f" style="width:${(v / scale) * 100}%"></div></div><span>${pct(v)}</span></div>`;
+  let html = labels.map((lbl, i) => `<div class="frow"><div class="lbl">${lbl}</div><div class="bars">${bar("fast", r.fast[i])}${slowOn ? bar("slow", r.slow[i]) : ""}</div></div>`).join("");
+  html += `<div class="frow"><div class="lbl">Total chance of catastrophe</div><div class="bars">${bar("tot", r.cond)}</div></div>`;
+  document.getElementById("funnel").innerHTML = html;
+}
+
+function renderTornado(r) {
+  const key = sensMode === "cond" ? "cond" : "uncond";
+  const base = r[key];
+  const rows = PARAMS.filter(p => p.id !== "str" && !(key === "cond" && p.id === "rsi") && (!p.slow || slowOn)).map(p => {
+    const a = compute({ ...state, [p.id]: Math.max(0, state[p.id] - 0.15) })[key];
+    const b = compute({ ...state, [p.id]: Math.min(1, state[p.id] + 0.15) })[key];
+    return { p, min: Math.min(a, b), max: Math.max(a, b), span: Math.abs(b - a) };
+  }).sort((x, y) => y.span - x.span);
+  const scaleMax = Math.max(0.05, Math.ceil(Math.max(...rows.map(x => x.max), base) * 20 + 1e-4) / 20);
+  const x = v => (v / scaleMax) * 100;
+  document.getElementById("tornado").innerHTML = rows.map(({ p, min, max }) =>
+    `<div class="trow"><span class="nm" title="${p.name}">${p.name}</span>
+      <div class="bar"><div class="seg" style="left:${x(min)}%;width:${Math.max(0.6, x(max) - x(min))}%"></div><div class="mid" style="left:calc(${x(base)}% - 1px)"></div></div>
+      <span class="rng">${pct(min)}–${pct(max)}</span></div>`).join("");
+  document.getElementById("ticks").innerHTML = Array.from({ length: 5 }, (_, i) => `<span>${Math.round(scaleMax * i / 4 * 1000) / 10}%</span>`).join("");
+}
+
+// MC-CORE-START
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function makeNormal(rng) {
+  let spare = null;
+  return function () {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u = 0; while (u === 0) u = rng();
+    const v = rng(), m = Math.sqrt(-2 * Math.log(u));
+    spare = m * Math.sin(2 * Math.PI * v);
+    return m * Math.cos(2 * Math.PI * v);
+  };
+}
+const logit = p => Math.log(p / (1 - p));
+const sigm = x => 1 / (1 + Math.exp(-x));
+const clampP = p => Math.min(0.999, Math.max(0.001, p));
+// Direction each input moves with the shared "hard world" factor (0 = independent)
+const MC_SIGN = { rsi: 0, isi: 1, mis: 1, ovs: -1, pur: 1, suc: 1, tim: 1, str: 0, misS: 1, ovsS: -1, purS: 1, sucS: 1, timS: 1 };
+const MC_N = 10000;
+function runMC(s, withSlow, sigma, rho, n, seed) {
+  const rng = mulberry32(seed), nrm = makeNormal(rng);
+  const ids = Object.keys(MC_SIGN);
+  const draws = {}; ids.forEach(id => draws[id] = new Float64Array(n));
+  const cond = new Float64Array(n), unc = new Float64Array(n);
+  const a = Math.sqrt(rho), b = Math.sqrt(1 - rho);
+  const centre = {}; ids.forEach(id => centre[id] = logit(clampP(s[id])));
+  const v = {};
+  for (let i = 0; i < n; i++) {
+    const g = nrm();
+    for (const id of ids) {
+      const e = nrm(), sg = MC_SIGN[id];
+      const z = sg === 0 ? e : sg * a * g + b * e;
+      v[id] = sigm(centre[id] + sigma * z);
+      draws[id][i] = v[id];
+    }
+    const f = v.isi * v.mis * (1 - v.ovs) * v.pur * v.suc * v.tim;
+    const sl = withSlow ? (1 - v.isi) * v.misS * (1 - v.ovsS) * v.purS * v.sucS * v.timS : 0;
+    cond[i] = f + sl;
+    unc[i] = cond[i] * v.rsi;
+  }
+  return { cond, unc, draws };
+}
+function quantile(sorted, q) { const pos = (sorted.length - 1) * q, lo = Math.floor(pos), hi = Math.ceil(pos); return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo); }
+function summarize(arr) {
+  const s = Float64Array.from(arr).sort(), n = s.length;
+  let sum = 0, g5 = 0, g10 = 0;
+  for (const x of s) { sum += x; if (x > 0.05) g5++; if (x > 0.1) g10++; }
+  return { mean: sum / n, p5: quantile(s, .05), p10: quantile(s, .1), p50: quantile(s, .5), p90: quantile(s, .9), p95: quantile(s, .95), p99: quantile(s, .99), gt5: g5 / n, gt10: g10 / n };
+}
+function ranks(arr) {
+  const n = arr.length, idx = Array.from({ length: n }, (_, i) => i).sort((p, q) => arr[p] - arr[q]);
+  const r = new Float64Array(n); for (let j = 0; j < n; j++) r[idx[j]] = j; return r;
+}
+function pearson(x, y) {
+  const n = x.length; let mx = 0, my = 0; for (let i = 0; i < n; i++) { mx += x[i]; my += y[i]; } mx /= n; my /= n;
+  let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < n; i++) { const dx = x[i] - mx, dy = y[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+  return sxy / Math.sqrt(sxx * syy);
+}
+// MC-CORE-END
+
+let mcSeed = 20261026, mcSigma = 1.0, mcRho = 0.3, mcBasis = "cond", lastMC = null, mcQueued = false;
+function scheduleMC() { if (mcQueued) return; mcQueued = true; requestAnimationFrame(() => { mcQueued = false; renderMC(); }); }
+
+function renderMC() {
+  const r = compute(state);
+  const mc = runMC(state, slowOn, mcSigma, mcRho, MC_N, mcSeed);
+  const sc = summarize(mc.cond), su = summarize(mc.unc);
+  lastMC = { sc, su };
+  document.getElementById("condMean").textContent = pct(sc.mean);
+  document.getElementById("mcSigmaOut").textContent = mcSigma.toFixed(1);
+  document.getElementById("mcRhoOut").textContent = Math.round(mcRho * 100) + "%";
+  const rng80 = p => `${pct(sigm(logit(p) - 1.2816 * mcSigma))}–${pct(sigm(logit(p) + 1.2816 * mcSigma))}`;
+  document.getElementById("mcSigmaHelp").textContent = mcSigma === 0
+    ? "No spread: every draw equals the slider values, so every simulation gives the same result."
+    : `At this setting an input at 50% has an 80% range of ${rng80(0.5)}, and one at 20% has ${rng80(0.2)}.`;
+  const row = (lbl, pt, s) => `<tr><td>${lbl}</td><td>${pct(pt)}</td><td>${pct(s.mean)}</td><td>${pct(s.p50)}</td><td>${pct(s.p10)}–${pct(s.p90)}</td><td>${Math.round(s.gt5 * 100)}%</td><td>${Math.round(s.gt10 * 100)}%</td></tr>`;
+  document.getElementById("mcTable").innerHTML =
+    `<thead><tr><th></th><th>Sliders as set</th><th>Mean</th><th>Median</th><th>80% range</th><th>P(&gt;5%)</th><th>P(&gt;10%)</th></tr></thead><tbody>` +
+    row("Assuming RSI in next 2 years", r.cond, sc) + row("Overall, including chance of RSI", r.uncond, su) + `</tbody>`;
+
+  const out = mcBasis === "cond" ? mc.cond : mc.unc, st = mcBasis === "cond" ? sc : su;
+  // Histogram
+  const bins = 40, xmax = Math.max(0.1, Math.ceil(st.p99 * 20) / 20), counts = new Array(bins).fill(0);
+  for (let i = 0; i < out.length; i++) counts[Math.min(bins - 1, Math.floor(out[i] / xmax * bins))]++;
+  const cmax = Math.max(...counts), W = 640, H = 200, L = 8, R = 8, T = 10, B = 28, pw = W - L - R, ph = H - T - B;
+  const X = v => L + Math.min(v, xmax) / xmax * pw;
+  let svg = "";
+  counts.forEach((c, i) => { const h = c / cmax * ph; svg += `<rect class="bin" x="${(L + i * pw / bins + 1).toFixed(1)}" y="${(T + ph - h).toFixed(1)}" width="${(pw / bins - 2).toFixed(1)}" height="${h.toFixed(1)}"/>`; });
+  svg += `<line class="base" x1="${L}" x2="${W - R}" y1="${T + ph}" y2="${T + ph}"/>`;
+  svg += `<line class="med" x1="${X(st.p50)}" x2="${X(st.p50)}" y1="${T}" y2="${T + ph}"/><line class="avg" x1="${X(st.mean)}" x2="${X(st.mean)}" y1="${T}" y2="${T + ph}"/>`;
+  for (let k = 0; k <= 4; k++) { const v = xmax * k / 4, anchor = k === 0 ? "start" : k === 4 ? "end" : "middle"; svg += `<text class="ax" x="${X(v)}" y="${H - 8}" text-anchor="${anchor}">${Math.round(v * 1000) / 10}%</text>`; }
+  document.getElementById("hist").innerHTML = svg;
+
+  // Rank correlations
+  const orank = ranks(out);
+  const rows = PARAMS.filter(p => p.id !== "str" && !(mcBasis === "cond" && p.id === "rsi") && (!p.slow || slowOn))
+    .map(p => ({ p, c: pearson(ranks(mc.draws[p.id]), orank) })).sort((a, b) => Math.abs(b.c) - Math.abs(a.c));
+  const scale = Math.max(0.2, Math.ceil(Math.max(...rows.map(x => Math.abs(x.c))) * 10) / 10);
+  const xp = v => 50 + v / scale * 50;
+  document.getElementById("rc").innerHTML = rows.map(({ p, c }) => {
+    const lo = Math.min(50, xp(c)), w = Math.max(0.6, Math.abs(xp(c) - 50));
+    return `<div class="trow"><span class="nm" title="${p.name}">${p.name}</span><div class="bar"><div class="seg" style="left:${lo}%;width:${w}%"></div><div class="zero"></div></div><span class="rng">${(c >= 0 ? "+" : "") + c.toFixed(2)}</span></div>`;
+  }).join("");
+  document.getElementById("rcTicks").innerHTML = [-scale, 0, scale].map(v => `<span>${v > 0 ? "+" : ""}${v.toFixed(1)}</span>`).join("");
+}
+
+document.getElementById("mcSigma").addEventListener("input", e => { mcSigma = parseFloat(e.target.value); scheduleMC(); });
+document.getElementById("mcRho").addEventListener("input", e => { mcRho = parseFloat(e.target.value); scheduleMC(); });
+document.getElementById("mcSeedBtn").addEventListener("click", () => { mcSeed = (mcSeed * 1664525 + 1013904223) >>> 0; scheduleMC(); });
+document.querySelectorAll("[data-mcb]").forEach(b => b.addEventListener("click", () => {
+  mcBasis = b.dataset.mcb;
+  document.querySelectorAll("[data-mcb]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  scheduleMC();
+}));
+
+document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => {
+  Object.assign(state, PRESETS[b.dataset.preset]);
+  document.querySelectorAll("[data-preset]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  render();
+}));
+document.querySelectorAll("[data-sens]").forEach(b => b.addEventListener("click", () => {
+  sensMode = b.dataset.sens;
+  document.querySelectorAll("[data-sens]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  render();
+}));
+
+document.getElementById("copyBtn").addEventListener("click", () => {
+  const r = compute(state);
+  const text = [
+    `Catastrophe from misaligned AI by 2031 (${slowOn ? "fast and slow takeoff" : "fast takeoff only"})`,
+    `Assuming RSI in next 2 years: ${pct(r.cond)} (strict only: ${pct(r.condStrict)})` + (slowOn ? ` [fast ${pct(r.f)}, slow ${pct(r.sl)}]` : ""),
+    `Overall (including chance of RSI): ${pct(r.uncond)}`,
+    ...(lastMC ? [`Monte Carlo (spread ${mcSigma.toFixed(1)}, shared factor ${Math.round(mcRho * 100)}%): assuming RSI: median ${pct(lastMC.sc.p50)}, mean ${pct(lastMC.sc.mean)}, 80% range ${pct(lastMC.sc.p10)}–${pct(lastMC.sc.p90)}; P(>10%) ${Math.round(lastMC.sc.gt10 * 100)}%`] : []),
+    "",
+    "Inputs:",
+    ...PARAMS.filter(p => !p.slow || slowOn).map(p => `  ${p.name}: ${Math.round(state[p.id] * 100)}%`),
+  ].join("\n");
+  const msg = document.getElementById("copyMsg"), fb = document.getElementById("copyFallback");
+  const fallback = () => { fb.value = text; fb.hidden = false; fb.focus(); fb.select(); msg.textContent = "Select and copy the text below."; };
+  try { navigator.clipboard.writeText(text).then(() => { msg.textContent = "Copied."; fb.hidden = true; }, fallback); } catch (e) { fallback(); }
 });
 
-// bibliography (unique sources)
-const bib=document.getElementById("bib");const used=new Set();
-[...D].sort((a,b)=>a.src.localeCompare(b.src)).forEach(r=>{if(used.has(r.url))return;used.add(r.url);
-  const li=document.createElement("li");li.innerHTML=`${r.src}. <a href="${r.url}" target="_blank" rel="noopener">${r.url}</a>`;bib.appendChild(li)});
-[["Cunningham, Forecasts of AI & Economic Growth (format model)","https://tecunningham.github.io/posts/2025-10-19-forecasts-of-AI-growth.html"],
- ["Virev, Will AI kill us all? (secondary compilation used for several 2025–26 quotes)","https://virev.ai/blog/will-ai-kill-us-all"]].forEach(([s,u])=>{const li=document.createElement("li");li.innerHTML=`${s}. <a href="${u}" target="_blank" rel="noopener">${u}</a>`;bib.appendChild(li)});
+render();
 </script>
 
-</body>
-</html>
+</body></html>
