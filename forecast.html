@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Forecasts of AI Loss-of-Control Risk</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column (~720px) in the style of an academic blog post; chart and tables may run wider, each scrolls inside its own box */
+:root{
+  --bg:#fbfcfd; --surface:#f1f4f7; --ink:#15202b; --muted:#5a6775; --rule:#d9e0e7;
+  --mis:#2456a6; --mixed:#7a4f9e; --und:#b26a00; --und-bg:#fff4e0; --mis-bg:#e8effa; --mixed-bg:#f2eaf8;
+  --t-ai:#0072B2; --t-lab:#D55E00; --t-sf:#009E73; --t-fc:#CC79A7; --t-other:#6b7785;
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#18212a; --ink:#e6ebf0; --muted:#98a5b3; --rule:#2a3540;
+  --mis:#7aa7f0; --mixed:#c39be6; --und:#f0a940; --und-bg:#3a2a10; --mis-bg:#1a2a44; --mixed-bg:#2c2038; --t-ai:#56B4E9; --t-lab:#F28E4B; --t-sf:#2DCDA0; --t-fc:#E39BC2; --t-other:#9aa7b5; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#18212a; --ink:#e6ebf0; --muted:#98a5b3; --rule:#2a3540;
+  --mis:#7aa7f0; --mixed:#c39be6; --und:#f0a940; --und-bg:#3a2a10; --mis-bg:#1a2a44; --mixed-bg:#2c2038; --t-ai:#56B4E9; --t-lab:#F28E4B; --t-sf:#2DCDA0; --t-fc:#E39BC2; --t-other:#9aa7b5; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.wide{max-width:1080px;margin:0 auto;width:100%}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:2.3rem}
+h2{font-size:1.6rem;margin-top:28px;padding-top:16px;border-top:1px solid var(--rule)}
+h3{font-size:1.15rem;margin-top:10px}
+p{margin:0}
+a{color:var(--mis)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 24px;font-size:.85rem;color:var(--muted)}
+.meta b{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.box{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;font-size:.88rem}
+.box ul{margin:6px 0 0;padding-left:18px}
+.badge{display:inline-block;font-family:var(--f-mono);font-size:.68rem;font-weight:500;padding:2px 7px;border-radius:999px;white-space:nowrap;letter-spacing:.02em}
+.b-mis{background:var(--surface);color:var(--ink);border:1px solid var(--ink)}
+.b-mixed{background:var(--surface);color:var(--ink);border:1px dashed var(--ink)}
+.b-und{background:var(--und-bg);color:var(--und);border:1px solid var(--und)}
+ol.findings{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+/* chart */
+figure{margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.85rem;margin-bottom:8px}
+.controls button{font:inherit;font-size:.82rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);padding:5px 12px;border-radius:999px;cursor:pointer}
+.controls button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.controls button:focus-visible{outline:2px solid var(--mis);outline-offset:2px}
+.chartbox{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--bg)}
+svg#chart{display:block;width:100%;min-width:640px;height:auto}
+svg text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.8rem;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend button{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:.8rem;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:4px 11px;cursor:pointer}
+.legend button[aria-pressed="false"]{opacity:.45}
+.legend button:focus-visible{outline:2px solid var(--mis);outline-offset:2px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.sq{border-radius:2px}
+.srcc{white-space:nowrap}
+.srcc small{display:block;color:var(--muted);font-size:.72rem;margin-left:16px}
+.rowcount{font-size:.82rem;color:var(--muted);max-width:760px;margin:6px auto 0}
+figcaption{font-size:.82rem;color:var(--muted);margin-top:8px}
+#tip{position:fixed;pointer-events:none;max-width:320px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;font-size:.8rem;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:20}
+#tip b{font-family:var(--f-mono)}
+/* tables */
+.tablebox{overflow-x:auto;border-top:2px solid var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:.84rem;min-width:1020px}
+th{text-align:left;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--rule)}
+td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:500}
+td.date{white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+td q{font-style:italic}
+td .note{display:block;color:var(--muted);font-size:.78rem;margin-top:3px}
+tr.dim{display:none}
+.bib{font-size:.85rem;padding-left:20px;display:flex;flex-direction:column;gap:4px;margin:0}
+.bib a{word-break:break-word}
+@media (max-width:520px){h1{font-size:1.8rem}body{font-size:15px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <h1>Forecasts of AI Loss-of-Control &amp; Existential Risk</h1>
+    <div class="meta">
+      <div><b>Compiled</b>24 October 2026 · updated 25 October (wider search)</div>
+      <div><b>Scope</b>Quantitative estimates, 2020–2026</div>
+      <div><b>Modelled on</b><a href="https://tecunningham.github.io/posts/2025-10-19-forecasts-of-AI-growth.html">Cunningham, Forecasts of AI &amp; Economic Growth</a></div>
+    </div>
+  </header>
+
+  <div class="box">
+    <strong>How the mechanism is classified.</strong> Each estimate gets one tag.
+    <ul>
+      <li><span class="badge b-mis">Misalignment / loss of control</span> the question or speaker specifies AI takeover, misaligned or power-seeking AI, or humans losing control of AI.</li>
+      <li><span class="badge b-mixed">Mixed</span> the source says explicitly that the number covers both misaligned AI and human misuse.</li>
+      <li><span class="badge b-und">⚠ Undetermined</span> labelled AI catastrophe, extinction or doom without saying whether misalignment or misuse is meant. Where context points one way, a note says so, but the tag stays.</li>
+    </ul>
+    <p style="margin-top:8px">Several figures come from secondary reports rather than the primary document; these are marked “via secondary report” in the table.</p>
+  </div>
+</div>
+
+<div class="wide" style="margin-top:24px">
+  <figure>
+    <div class="controls" role="group" aria-label="Filter by mechanism">
+      <span style="color:var(--muted)">Mechanism:</span>
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">All estimates</button>
+      <button type="button" id="f-mis" data-f="mis" aria-pressed="false">Misalignment only</button>
+      <button type="button" id="f-und" data-f="und" aria-pressed="false">Undetermined only</button>
+      <button type="button" id="f-mixed" data-f="mixed" aria-pressed="false">Mixed only</button>
+    </div>
+    <div class="chartbox"><svg id="chart" viewBox="0 0 960 470" role="img" aria-label="Scatter of AI catastrophe and loss-of-control probability estimates by date, log scale, coloured by source type"></svg></div>
+    <div class="legend" id="legend" role="group" aria-label="Show or hide source types"></div>
+    <div class="legend" style="margin-top:6px">
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--muted)"/></svg>Individual estimate</span>
+      <span><svg width="14" height="14"><rect x="2" y="2" width="10" height="10" fill="var(--muted)"/></svg>Survey / group median</span>
+      <span><svg width="14" height="14"><line x1="7" y1="1" x2="7" y2="13" stroke="var(--muted)" stroke-width="2"/></svg>Stated range</span>
+    </div>
+    <figcaption>Probability (log scale) against the date the estimate was made. Colour shows who made the estimate; shape shows whether it is one person or a survey or group median. Click a legend entry to hide or show that source type. Hover or tap a point for the outcome, horizon and mechanism. Horizons differ a lot (next decade, 30 years, 2050, 2070, 2100, unbounded), so vertical comparisons are rough. Yudkowsky’s ~99.5% sits at the top edge. <strong>Source-type judgement calls:</strong> FRI’s sceptic group was nine superforecasters and two domain experts, and its concerned group was eleven domain experts. Samotsvety, Lifland and Metaculus are shown as other forecasters, not superforecasters. Hubinger works at Anthropic but is not a founder, so he is counted as an AI expert. Mostaque, who founded Stability AI, is counted as a lab founder. Ord, Carlsmith, Alexander and commentators such as Mowshowitz, Silver, Roose and Fridman are “other”. Twelve estimates added on 25 October (Aaronson, Roose, Critch, Leahy, Mostaque, Silver, Tegmark, Fridman, Mowshowitz, Harvard survey, Yampolskiy, Metaculus) mostly come from Wikipedia’s p(doom) table and are marked as secondary.</figcaption>
+  </figure>
+</div>
+
+<div class="wrap" style="margin-top:28px">
+  <p>I’ve collected published probabilities that AI causes human extinction, permanent disempowerment or a global catastrophe, focusing on risk from misaligned AI and loss of control. Where a number is labelled only as “AI extinction” or “AI catastrophe” I include it and flag that the mechanism is undetermined.</p>
+
+  <h3>What the collection shows</h3>
+  <ol class="findings">
+    <li><strong>Most headline numbers don’t specify misalignment.</strong> Of the figures most often quoted in policy settings (Hinton 10–20%, Amodei 10–25%, the XPT tournament, the FRI LEAP panel, the AI Impacts headline question), none separates loss of control from misuse. Fewer than a third of the estimates here are cleanly about misalignment.</li>
+    <li><strong>Where misalignment is specified, estimates cluster at 10–35%.</strong> Ord 10%, Carlsmith &gt;10%, Christiano 22% for takeover, Samotsvety 25%, Lifland 35%, Shlegeris 35% over ten years. AI researchers asked about “inability to control” give a median of 9–10%. The outliers are Yudkowsky (~99.5%) and the Conjecture staff survey (70%).</li>
+    <li><strong>Group disagreement spans two orders of magnitude.</strong> Superforecasters (0.38% AI extinction by 2100; 2.4% AI catastrophe by 2100 in 2026) and FRI’s sceptic group (0.1%; nine of its eleven members were superforecasters) sit far below AI safety researchers (25–35%). FRI’s own conditional questions suggest much of the gap is about how fast capabilities arrive: experts’ AI-catastrophe forecast for 2100 rises from 2% under slow progress to 10% under rapid progress.</li>
+    <li><strong>Question wording moves the answer about as much as time does.</strong> In the 2022 and 2023 AI Impacts surveys the narrower “inability to control” question got a <em>higher</em> median (10%) than the broader “AI advances causing extinction” question (5%), which is logically odd given the first is a subset. In the 2024 survey the order flipped (9% vs 10%).</li>
+    <li><strong>The researcher median has drifted up; forecaster numbers have not.</strong> The AI Impacts headline question doubled from 5% (2023) to 10% (fielded December 2024). FRI’s 2026 expert panel gives 5% for an AI catastrophe by 2100, below the 12% from XPT experts in 2022, though the panels differ.</li>
+  </ol>
+</div>
+
+<div class="wide" style="margin-top:28px">
+  <h2 style="max-width:760px;margin-left:auto;margin-right:auto">Quantitative estimates</h2>
+  <p class="rowcount" id="rowcount"></p>
+  <div class="tablebox" style="margin-top:12px">
+    <table id="tbl">
+      <thead><tr><th>Date made</th><th>Who</th><th>Source type</th><th>Estimate</th><th>Outcome &amp; horizon</th><th>Mechanism</th><th>Quote or paraphrase</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="wrap" style="margin-top:28px">
+  <h2>FRI LEAP wave 12 in detail</h2>
+  <p>Wave 12 (August–September 2026) asks one question: the probability of an <em>AI-caused catastrophe</em> by 31 December 2050, defined as an event in which more than 10% of the people alive at the start of a five-year period die. It reports no extinction or loss-of-control figure and no misalignment-versus-misuse split, so every number here is <span class="badge b-und">⚠ Undetermined</span>. The first three baseline figures are the ones plotted above; the general public, which is not a forecaster group, and the policy scenarios appear only here. All figures are medians.</p>
+  <div class="tablebox">
+    <table style="min-width:680px">
+      <thead><tr><th>Scenario (catastrophe by 2050)</th><th>Experts</th><th>AI risk experts</th><th>Super&shy;forecasters</th><th>General public</th></tr></thead>
+      <tbody id="w12"></tbody>
+    </table>
+  </div>
+  <p class="note" style="font-size:.8rem;color:var(--muted)">“–” means the report gives no figure for that group. Policy scenarios assume the policy is implemented immediately and kept in force through 2050. The bundle (international pre-release authorisation, a US–China capability slowdown and strict liability) is reported only as a percentage reduction in risk; the report does not give the absolute values. Strict liability on its own is described as lowering risk for some groups, with no number. Source: <a href="https://leap.forecastingresearch.org/reports/wave12" target="_blank" rel="noopener">FRI LEAP, Wave 12</a>.</p>
+
+  <h2>Qualitative positions</h2>
+  <div class="tablebox">
+    <table style="min-width:640px">
+      <thead><tr><th>Date</th><th>Who</th><th>Position</th><th>Mechanism</th></tr></thead>
+      <tbody>
+        <tr><td class="date">Dec 2023</td><td>Yann LeCun</td><td>Compared the risk to an asteroid strike, without a number. The widely circulated “&lt;0.01%” was someone else’s gloss. In Oct 2026 said he was not worried about extinction at all.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
+        <tr><td class="date">Jul 2025</td><td>Demis Hassabis</td><td>Declined to give a number; said risk is <q>definitely non-zero and it’s probably non-negligible</q>.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
+        <tr><td class="date">Feb 2026</td><td>International AI Safety Report</td><td>No probability. Treats loss of control as a distinct risk category, says current systems cannot trigger it at civilisational scale, and records deep expert uncertainty about future scenarios.</td><td><span class="badge b-mis">Misalignment / loss of control</span></td></tr>
+        <tr><td class="date">May 2026</td><td>Yoshua Bengio</td><td>Now declines to restate his 2023 figure: <q>I’d rather stay out of the p(doom) game.</q></td><td><span class="badge b-mixed">Mixed</span></td></tr>
+        <tr><td class="date">Jul 2026</td><td>Elon Musk</td><td>Moved from “10% or 20%” (2024) to saying only that the risk is not zero.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
+        <tr><td class="date">Sep 2026</td><td>Jacob Coxon (resigned from Anthropic)</td><td>Gave no number. Said <q>the people building AI earnestly believe that it could kill us all by the end of the decade</q> and that no other human activity poses this level of danger. Evan Hubinger’s &gt;10% figure above was a reply to this thread.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
+        <tr><td class="date">Sep 2026</td><td>Jensen Huang</td><td>Gave 0% that AI ends the world by 2030.</td><td><span class="badge b-und">⚠ Undetermined</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Notes on interpretation</h2>
+  <p><strong>Horizons.</strong> Ord’s figure is for this century, Carlsmith’s for 2070, the tournaments’ for 2100, Hinton’s for 30 years, Hubinger’s and Shlegeris’s for ten years, and many personal numbers have no horizon at all. A 10% figure over ten years implies far higher annual hazard than 10% by 2100.</p>
+  <p><strong>Outcome severity.</strong> “Extinction”, “existential catastrophe” (which includes permanent disempowerment and lock-in), and “catastrophe” (FRI: more than 10% of people die within five years) are different events. FRI’s XPT gives roughly a 5:1 ratio of AI catastrophe to AI extinction for superforecasters, and 4:1 for experts.</p>
+  <p><strong>Selection.</strong> Safety-researcher surveys (Bensinger 2021, Conjecture 2023, Summit on Existential Security 2026) select for concern; AI Impacts had a 10–17% response rate, though the authors report that respondents attentive and inattentive to the topic gave similar medians.</p>
+  <p><strong>Mixed figures.</strong> Bengio’s 20% explicitly includes humans turning AI against humanity. Christiano’s 46% “irreversibly messed up” includes takeover (22%) plus non-takeover paths. These are tagged mixed, not undetermined.</p>
+
+  <h2>Sources</h2>
+  <ol class="bib" id="bib"></ol>
+</div>
+
+<div id="tip" hidden></div>
+
+<script>
+// m: mis | mixed | und ; k: ind (individual) | grp (survey/forecast group)
+// d: decimal year when the estimate was made
+const D=[
+{id:"ord",d:2020.2,date:"Mar 2020",who:"Toby Ord, The Precipice",k:"ind",v:10,lab:"10% (1 in 10)",out:"Existential catastrophe from unaligned AI, next 100 years",m:"mis",q:"Rates “unaligned artificial intelligence” at 1 in 10 this century, his largest single risk.",src:"Ord on 80,000 Hours",url:"https://80000hours.org/podcast/episodes/toby-ord-the-precipice-existential-risk-future-humanity/"},
+{id:"carl21",d:2021.3,date:"Apr 2021",who:"Joe Carlsmith",k:"ind",v:5,lab:"~5%",out:"Existential catastrophe from power-seeking misaligned AI, by 2070",m:"mis",q:"Six-premise argument; original estimate ~5%.",src:"Carlsmith, Is Power-Seeking AI an Existential Risk?",url:"https://arxiv.org/abs/2206.13353"},
+{id:"carl22",d:2022.4,date:"May 2022",who:"Joe Carlsmith",k:"ind",v:10,lab:">10%",out:"Same question, by 2070",m:"mis",q:"“my estimate here has gone up, and is now at >10%”",src:"Carlsmith, Is Power-Seeking AI an Existential Risk? (May 2022 note)",url:"https://arxiv.org/abs/2206.13353",cite:"carl21"},
+{id:"bens",d:2021.42,date:"Jun 2021",who:"Bensinger survey, 44 AI safety researchers",k:"grp",v:30,lab:"30% (median)",out:"Future drastically worse because AI systems don’t do what deployers intended; no horizon",m:"mis",q:"Responses ranged from ~1% to ~99%; MIRI staff gave a 70% median.",src:"Bensinger, “Existential risk from AI” survey results",url:"https://www.alignmentforum.org/posts/QvwSr5LsxyDeaPK5s/existential-risk-from-ai-survey-results"},
+{id:"aii22c",d:2022.55,date:"Jul 2022",who:"AI Impacts 2022 survey, ML researchers (n≈162 on this item)",k:"grp",v:10,lab:"10% (median)",out:"“Human inability to control” advanced AI causing extinction or permanent disempowerment; no horizon",m:"mis",q:"“human inability to control future advanced AI systems”",src:"AI Impacts, 2022 Expert Survey on Progress in AI",url:"https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/"},
+{id:"aii22g",d:2022.55,date:"Jul 2022",who:"AI Impacts 2022 survey, ML researchers (n≈149)",k:"grp",v:5,lab:"5% (median)",out:"Future AI advances causing extinction or permanent disempowerment; no horizon",m:"und",q:"Broader version of the question; mechanism not specified.",src:"AI Impacts, 2022 Expert Survey on Progress in AI",url:"https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/",cite:"aii22c"},
+{id:"samo",d:2022.69,date:"Sep 2022",who:"Samotsvety forecasters (n=13)",k:"grp",v:25,lab:"25% (aggregate)",out:"Misaligned AI takeover by 2100",m:"mis",q:"“probability of misaligned AI takeover by 2100, barring pre-APS-AI catastrophe”",src:"Samotsvety’s AI risk forecasts",url:"https://samotsvety.org/blog/2022/09/09/samotsvety-s-ai-risk-forecasts/"},
+{id:"lif",d:2022.7,date:"Sep 2022",who:"Eli Lifland",k:"ind",v:35,lab:"35%",out:"AI takeover by 2100",m:"mis",q:"Gave 35% for AI takeover by 2100 in his review of What We Owe the Future.",src:"Lifland comment on Samotsvety’s AI risk forecasts",url:"https://www.greaterwrong.com/posts/YMsD7GA7eTg2BafQd/samotsvety-s-ai-risk-forecasts",sec:true},
+{id:"xptsx",d:2022.8,date:"Jun–Oct 2022",who:"XPT tournament, superforecasters",k:"grp",v:0.38,lab:"0.38% (median)",out:"AI-caused extinction (population <5,000) by 2100",m:"und",q:"Superforecasters gave 2.13% for an AI catastrophe (>10% die) by 2100.",src:"FRI, Forecasting Existential Risk (XPT)",url:"https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf"},
+{id:"xptex",d:2022.8,date:"Jun–Oct 2022",who:"XPT tournament, AI domain experts",k:"grp",v:3,lab:"3% (median)",out:"AI-caused extinction by 2100",m:"und",q:"Experts gave 12% for an AI catastrophe by 2100.",src:"FRI, Forecasting Existential Risk (XPT)",url:"https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf",cite:"xptsx"},
+{id:"scott",d:2023.2,date:"Mar 2023",who:"Scott Alexander",k:"ind",v:33,lab:"~33%",out:"Misaligned AI kills or disempowers humanity; no horizon",m:"mis",q:"“if you force me to give an estimate it’s probably around 33%”",src:"Astral Codex Ten, Why I Am Not (As Much Of) A Doomer",url:"https://www.astralcodexten.com/p/why-i-am-not-as-much-of-a-doomer"},
+{id:"conjc",d:2023.29,date:"Apr 2023",who:"Conjecture staff survey (n=23)",k:"grp",v:70,lab:"70% (median)",out:"Inability to control AI causing extinction or permanent disempowerment",m:"mis",q:"Mean 59%. Same loss-of-control wording as AI Impacts.",src:"Conjecture internal survey",url:"https://www.lesswrong.com/posts/kygEPBDrGGoM8rz9a/agi-timelines-and-estimations-of-probability-of-human"},
+{id:"conjg",d:2023.29,date:"Apr 2023",who:"Conjecture staff survey (n=23)",k:"grp",v:80,lab:"80% (median)",out:"AI causing extinction or permanent disempowerment, all causes",m:"mixed",q:"Question explicitly includes misalignment and misuse; mean 71%.",src:"Conjecture internal survey",url:"https://www.lesswrong.com/posts/kygEPBDrGGoM8rz9a/agi-timelines-and-estimations-of-probability-of-human",cite:"conjc"},
+{id:"chr22",d:2023.32,date:"Apr 2023",who:"Paul Christiano",k:"ind",v:22,lab:"22%",out:"AI takeover (15% from systems humans build, 7% later); no horizon",m:"mis",q:"“Probability of an AI takeover: 22%”",src:"Christiano, My views on “doom”",url:"https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom"},
+{id:"chr46",d:2023.32,date:"Apr 2023",who:"Paul Christiano",k:"ind",v:46,lab:"46%",out:"Humanity irreversibly messes up its future within 10 years of powerful AI",m:"mixed",q:"Sum of takeover (22%), non-takeover extinction (9%) and other failures.",src:"Christiano, My views on “doom”",url:"https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom",cite:"chr22"},
+{id:"aic23",d:2023.4,date:"Apr–May 2023",who:"FRI adversarial collaboration, AI domain experts (“concerned” group)",k:"grp",v:25,lab:"25% (median)",out:"Existential catastrophe due to AI by 2100",m:"und",q:"Eleven domain experts; 20% after debate. Their top cruxes were about alignment, but the question names no mechanism.",src:"FRI, Roots of Disagreement on AI Risk",url:"https://forum.effectivealtruism.org/posts/orhjaZ3AJMHzDzckZ/results-from-an-adversarial-collaboration-on-ai-risk-fri"},
+{id:"ais23",d:2023.4,date:"Apr–May 2023",who:"FRI adversarial collaboration, superforecasters (“sceptic” group)",k:"grp",v:0.1,lab:"0.10% (median)",out:"Existential catastrophe due to AI by 2100",m:"und",q:"Nine superforecasters and two domain experts; 0.12% after debate.",src:"FRI, Roots of Disagreement on AI Risk",url:"https://forum.effectivealtruism.org/posts/orhjaZ3AJMHzDzckZ/results-from-an-adversarial-collaboration-on-ai-risk-fri",cite:"aic23"},
+{id:"leike",d:2023.45,date:"2023",who:"Jan Leike",k:"ind",v:50,lo:10,hi:90,lab:"10–90%",out:"AI doom; no horizon",m:"und",q:"Gave a deliberately wide range in a 2023 interview.",src:"If Anyone Builds It: AI experts on catastrophe scenarios",url:"https://ifanyonebuildsit.com/intro/ai-experts-on-catastrophe-scenarios",sec:true},
+{id:"beng",d:2023.53,date:"Jul 2023",who:"Yoshua Bengio",k:"ind",v:20,lab:"~20%",out:"Catastrophe; no horizon",m:"mixed",q:"“I got around, like, 20 per cent probability that it turns out catastrophic.”",src:"ABC News (Australia), What’s your p(doom)?",url:"https://www.abc.net.au/news/2023-07-15/whats-your-pdoom-ai-researchers-worry-catastrophe/102591340",note:"Inputs explicitly included AI or humans turning the technology against humanity."},
+{id:"amo23",d:2023.78,date:"Oct 2023",who:"Dario Amodei",k:"ind",v:17.5,lo:10,hi:25,lab:"10–25%",out:"Civilisation-scale catastrophe; no horizon",m:"und",q:"“something goes really quite catastrophically wrong on the scale of human civilization”",src:"The Logan Bartlett Show, Oct 2023",url:"https://www.youtube.com/watch?v=gAaCqj6j5sQ&t=5895s"},
+{id:"hin23",d:2023.83,date:"Oct 2023",who:"Geoffrey Hinton",k:"ind",v:10,lab:"10%",out:"Extinction within 30 years if AI is not strongly regulated",m:"und",q:"“My current estimate is 0.1.”",src:"Hinton on X, 31 Oct 2023",url:"https://x.com/geoffreyhinton/status/1719447980753719543",sec:true},
+{id:"aii23c",d:2023.8,date:"Oct 2023",who:"AI Impacts 2023 survey (2,778 researchers)",k:"grp",v:10,lab:"10% (median)",out:"Inability to control AI causing extinction or permanent disempowerment",m:"mis",q:"Loss-of-control variant; headline question got 5% (mean 16.2%).",src:"Grace et al., Thousands of AI Authors on the Future of AI",url:"https://arxiv.org/abs/2401.02843",sec:true},
+{id:"aii23g",d:2023.8,date:"Oct 2023",who:"AI Impacts 2023 survey (2,778 researchers)",k:"grp",v:5,lab:"5% (median)",out:"Future AI advances causing extinction or permanent disempowerment",m:"und",q:"“future AI advances causing human extinction or similarly permanent and severe disempowerment”",src:"Grace et al., Thousands of AI Authors on the Future of AI",url:"https://arxiv.org/abs/2401.02843",cite:"aii23c"},
+{id:"musk",d:2024.2,date:"Mar 2024",who:"Elon Musk",k:"ind",v:15,lo:10,hi:20,lab:"10–20%",out:"AI ending humanity; no horizon",m:"und",q:"“10% or 20% or something like that”",src:"Musk at Abundance360, Mar 2024",url:"https://www.youtube.com/watch?v=akXMYvKjUxM&t=95s",sec:true},
+{id:"kok24",d:2024.43,date:"Jun 2024",who:"Daniel Kokotajlo",k:"ind",v:70,lab:"~70%",out:"AI destroys or catastrophically harms humanity; no horizon",m:"und",q:"Told the New York Times the chance AI wrecks humanity is around 70%.",src:"Futurism, OpenAI insider estimates 70 percent chance",url:"https://futurism.com/openai-insider-70-percent-doom",sec:true,note:"His AI 2027 scenario’s bad ending is misaligned AI, but the 70% itself names no mechanism."},
+{id:"hin24",d:2024.98,date:"Dec 2024",who:"Geoffrey Hinton",k:"ind",v:15,lo:10,hi:20,lab:"10–20%",out:"AI leads to human extinction within 30 years",m:"und",q:"Asked if his 10% had changed: “Not really, 10 to 20 percent.”",src:"BBC Radio 4 Today, reported by Der Standard",url:"https://www.derstandard.at/story/3000000251128/geoffrey-hinton-beziffert-risiko-neu-dass-uns-ki-ausrotten-wird",sec:true,note:"Spoke in the same interview about AI evading human control."},
+{id:"aii24g",d:2024.95,date:"Dec 2024",who:"AI Impacts 2024 survey (1,580 researchers)",k:"grp",v:10,lab:"10% (median)",out:"Future AI advances causing extinction or permanent disempowerment",m:"und",q:"Mean 18.3%. First time this question’s median reached 10%. Published Sep 2026.",src:"AI Impacts, Advanced AI according to 1,580 researchers (ESPAI 2024)",url:"https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf",sec:true},
+{id:"aii24c",d:2024.95,date:"Dec 2024",who:"AI Impacts 2024 survey (1,580 researchers)",k:"grp",v:9,lab:"9% (median)",out:"Inability to control AI causing extinction or permanent disempowerment",m:"mis",q:"Loss-of-control variant, slightly below the headline question this time.",src:"AI Impacts, ESPAI 2024",url:"https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf",sec:true,cite:"aii24g"},
+{id:"hin25",d:2025.3,date:"Apr 2025",who:"Geoffrey Hinton",k:"ind",v:15,lo:10,hi:20,lab:"10–20%",out:"AI eventually takes control from humans",m:"mis",q:"Framed as AI that would “take over from humans”.",src:"PPC Land, report of CBS interview",url:"https://ppc.land/ai-pioneer-warns-of-superintelligence-takeover-within-next-two-decades/",sec:true},
+{id:"amo25",d:2025.71,date:"Sep 2025",who:"Dario Amodei",k:"ind",v:25,lab:"25%",out:"Things go “really, really badly”; no horizon",m:"und",q:"“There’s a 25% chance that things go really, really badly”",src:"Axios AI+ DC Summit",url:"https://www.axios.com/2025/09/17/anthropic-dario-amodei-p-doom-25-percent"},
+{id:"yud",d:2025.72,date:"Sep 2025",who:"Eliezer Yudkowsky",k:"ind",v:99.5,lab:"~99.5%",out:"Superintelligence built with current techniques kills everyone",m:"mis",q:"Told Kevin Roose there was a 99.5% chance AI would kill him.",src:"NYT profile (Roose), reprinted by DT Next",url:"https://www.dtnext.in/lifestyle/technology/doomsdai-846516",sec:true},
+{id:"alt",d:2025.8,date:"Oct 2025",who:"Sam Altman",k:"ind",v:2,lab:"~2%",out:"Human extinction; no horizon",m:"und",q:"“2%. Don’t take that as like a literal number I’ve calculated”",src:"MD MEETS interview, Oct 2025",url:"https://www.youtube.com/watch?v=rF0tQtDMwHM&t=1496s",sec:true},
+{id:"ses",d:2026.1,date:"Feb 2026",who:"Summit on Existential Security attendees (n=59)",k:"grp",v:25,lab:"25% (median)",out:"Human extinction or permanent disempowerment before 2100",m:"und",q:"Mean 34%. The question does not name AI or any mechanism.",src:"Survey of AI safety leaders (Feb 2026)",url:"https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and"},
+{id:"buck",d:2026.28,date:"Apr 2026",who:"Buck Shlegeris",k:"ind",v:35,lab:"~35%",out:"AI takeover within ten years",m:"mis",q:"“I think AI takeover in the next ten years is like 35%”",src:"Comment on the Summit survey post",url:"https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and"},
+{id:"l9ex",d:2026.42,date:"May–Jun 2026",who:"FRI LEAP wave 9, experts (AI domain experts)",k:"grp",v:5,lab:"5% (median)",out:"AI-caused catastrophe (>10% die within 5 years) by 2100",m:"und",q:"2% if progress is slow, 10% if rapid.",src:"FRI, Forecasting Major Risks from AI",url:"https://forecastingresearch.substack.com/p/forecasting-major-risks-from-ai",note:"Unconditional medians via secondary report; conditional figures from FRI."},
+{id:"l9sf",d:2026.42,date:"May–Jun 2026",who:"FRI LEAP wave 9, superforecasters",k:"grp",v:2.4,lab:"2.4% (median)",out:"AI-caused catastrophe by 2100",m:"und",q:"US public panel gave 7%.",src:"FRI, Forecasting Major Risks from AI",url:"https://forecastingresearch.substack.com/p/forecasting-major-risks-from-ai",sec:true,cite:"l9ex"},
+{id:"kok26",d:2026.53,date:"Jul 2026",who:"Daniel Kokotajlo",k:"ind",v:70,lab:"~70%",out:"Things go horribly wrong, e.g. extinction; no horizon",m:"und",q:"“something like 70% chance that this goes horribly wrong like human extinction”",src:"The Diary of a CEO, Jul 2026",url:"https://www.youtube.com/watch?v=_g4l7YkDQwA&t=2521s",sec:true},
+{id:"l12ex",d:2026.68,date:"Aug–Sep 2026",who:"FRI LEAP wave 12, experts (domain experts)",k:"grp",v:2,lab:"2% (median)",out:"AI-caused catastrophe by 2050",m:"und",q:"Unconditional, incl. expected policy. Superforecasters 1.6%, public 5%.",src:"FRI LEAP, Wave 12: Safety Policies",url:"https://leap.forecastingresearch.org/reports/wave12"},
+{id:"l12ar",d:2026.68,date:"Aug–Sep 2026",who:"FRI LEAP wave 12, AI risk experts",k:"grp",v:5.2,lab:"5.2% (median)",out:"AI-caused catastrophe by 2050",m:"und",q:"A minority of respondents focused on loss-of-control scenarios.",src:"FRI LEAP, Wave 12",url:"https://leap.forecastingresearch.org/reports/wave12",cite:"l12ex"},
+{id:"l12sf",d:2026.68,date:"Aug–Sep 2026",who:"FRI LEAP wave 12, superforecasters",k:"grp",v:1.6,lab:"1.6% (median)",out:"AI-caused catastrophe by 2050",m:"und",q:"Same question as above.",src:"FRI LEAP, Wave 12",url:"https://leap.forecastingresearch.org/reports/wave12",cite:"l12ex"},
+{id:"hub",d:2026.69,date:"Sep 2026",who:"Evan Hubinger (Anthropic)",k:"ind",v:10,lab:">10%",out:"AI kills all humans within ten years",m:"und",q:"“I personally think it is >10% within the next decade.”",src:"BBC News, Anthropic researcher believes more than 10% chance",url:"https://www.bbc.com/news/articles/ckgwy1k42w4o",note:"Posted in reply to Jacob Coxon’s resignation thread. Coxon left Anthropic in Sep 2026 and gave no number. Follow-up posts point to superintelligence from recursive self-improvement and no plan to solve alignment."},
+{id:"hin26",d:2026.7,date:"Sep 2026",who:"Geoffrey Hinton",k:"ind",v:10,lab:"~10%",out:"AI kills all humans within a decade (interviewer’s framing)",m:"und",q:"Called 10% “not an unreasonable estimate”.",src:"BBC Newsnight, Sep 2026",url:"https://www.youtube.com/watch?v=IZMjJGi4YhI&t=46s",sec:true},
+{id:"meta",d:2026.72,date:"Sep 2026",who:"Metaculus community",k:"grp",v:10,lab:"~10%",out:"World closest to “Paperclipalypse” (AI drives humans extinct) by 2050",m:"mis",q:"Scenario defines AIs as opposed or indifferent to human existence.",src:"Metaculus, Which of Scott Aaronson’s five AI worlds",url:"https://play.metaculus.com/questions/20683/which-of-scott-aaronsons-five-ai-worlds-will-come-to-pass",sec:true},
+{id:"aar",d:2023.95,date:"Dec 2023",who:"Scott Aaronson",k:"ind",v:2,lab:"~2%",out:"AI doom; no horizon",m:"und",q:"Gave roughly 2% in a blog post about having been wrong about AI.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"roos",d:2023.93,date:"Dec 2023",who:"Kevin Roose (journalist)",k:"ind",v:5,lab:"~5%",out:"AI doom; no horizon",m:"und",q:"Gave 5% in the New York Times.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"crit",d:2024.87,date:"Nov 2024",who:"Andrew Critch",k:"ind",v:85,lab:"~85%",out:"AI doom; no horizon",m:"und",q:"Gave 85% in a Doom Debates interview.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"leah",d:2024.89,date:"Nov 2024",who:"Connor Leahy (Conjecture)",k:"ind",v:90,lab:"90%+",out:"AI doom; no horizon",m:"und",q:"Stated 90% or more in a Future of Life Institute video.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"most",d:2024.92,date:"Dec 2024",who:"Emad Mostaque (founder of Stability AI)",k:"ind",v:50,lab:"~50%",out:"AI doom; no horizon",m:"und",q:"“My P(doom) is 50%”",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"silv",d:2025.07,date:"Jan 2025",who:"Nate Silver",k:"ind",v:7.5,lo:5,hi:10,lab:"5–10%",out:"AI doom; no horizon",m:"und",q:"Gave 5–10% in a Silver Bulletin essay.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"teg",d:2025.33,date:"Apr 2025",who:"Max Tegmark",k:"ind",v:90,lab:">90%",out:"AI doom; no horizon",m:"und",q:"Posted “My P(doom) Estimate” on X.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"frid",d:2025.43,date:"Jun 2025",who:"Lex Fridman",k:"ind",v:10,lab:"~10%",out:"AI doom; no horizon",m:"und",q:"Gave 10% in his interview with Sundar Pichai.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"zvi",d:2025.68,date:"Sep 2025",who:"Zvi Mowshowitz",k:"ind",v:70,lab:"~70%",out:"AI doom; no horizon",m:"und",q:"Gave 70% on The Cognitive Revolution podcast.",src:"Wikipedia, P(doom) table",url:"https://en.wikipedia.org/wiki/P(doom)",sec:true,note:"Date and number taken from Wikipedia’s p(doom) table; not checked against the original post."},
+{id:"harv",d:2026.2,date:"Mar 2026",who:"Harvard event survey, attendees of a talk on If Anyone Builds It, Everyone Dies (n=89)",k:"grp",v:50,lab:"50% (median, before event)",out:"AI-caused extinction or severe disempowerment from unimpeded AI development; no horizon",m:"und",q:"Median rose to 70% after the event. Self-selected audience, so not representative.",src:"Harvard SERL, Views on AI Existential Risk Before and After a Public Event",url:"https://serl.fas.harvard.edu/publication/views-ai-existential-risk-and-after-public-event-harvard-university"},
+{id:"yamp",d:2026.69,date:"Sep 2026",who:"Roman Yampolskiy",k:"ind",v:99.99,lab:"99.99%",out:"AI catastrophe; no horizon",m:"und",q:"Axios lists him at the top of its p(doom) range.",src:"Axios, Here’s how AI could kill us all",url:"https://www.axios.com/2026/09/09/ai-doom-pdoom-kill-all-humans-anthropic",sec:true,note:"Reported Sep 2026; he gave 99.9% or more in 2024 too. His work argues advanced AI cannot be controlled, but the quoted figure does not name a mechanism."},
+{id:"met5k",d:2026.81,date:"Oct 2026",who:"Metaculus community (87 forecasters)",k:"grp",v:3,lab:"3% (community prediction)",out:"AI causes human population to fall below 5,000 before 2100",m:"und",q:"Community prediction when read on 25 Oct 2026; the page does not say it is the median.",src:"Metaculus, AI-caused fall below 5,000 people",url:"https://metaculus.com/questions/27035"}
+];
+
+// source type: ai = AI experts & researchers, lab = AI lab founders/CEOs, sf = superforecasters, fc = other forecasters, other
+const T={
+ ai:["aar","crit","leah","teg","yamp","bens","aii22c","aii22g","conjc","conjg","chr22","chr46","aic23","xptex","leike","beng","hin23","hin24","hin25","hin26","aii23c","aii23g","aii24g","aii24c","kok24","kok26","yud","buck","hub","ses","l9ex","l12ex","l12ar"],
+ lab:["most","amo23","amo25","alt","musk"],
+ sf:["xptsx","ais23","l9sf","l12sf"],
+ fc:["samo","lif","meta","met5k"],
+ other:["ord","carl21","carl22","scott","roos","silv","frid","zvi","harv"]};
+const TY={ai:{n:"AI experts & researchers",s:"AI experts"},lab:{n:"AI lab founders / CEOs",s:"Lab founders"},sf:{n:"Superforecasters",s:"Superforecasters"},fc:{n:"Other forecasters",s:"Other forecasters"},other:{n:"Other (philosophers, commentators, public)",s:"Other"}};
+for(const t in T)T[t].forEach(id=>{const r=D.find(x=>x.id===id);r.t=t});
+if(D.some(r=>!r.t))console.error("untyped entries",D.filter(r=>!r.t).map(r=>r.id));
+// earlier restatements of the same estimate: still plotted, but folded into the latest table row
+const FOLD={carl21:"carl22",kok24:"kok26",hin23:"hin25",hin24:"hin25",hin26:"hin25",chr46:"chr22",amo23:"amo25",aii22g:"aii24g",aii23g:"aii24g",aii22c:"aii24c",aii23c:"aii24c"};
+const HIST={carl22:"Earlier: ~5% (Apr 2021).",kok26:"Same figure in Jun 2024 (via Futurism).",hin25:"Hinton’s other estimates are plotted but folded into this row: ~10% (Oct 2023) and 10–20% (Dec 2024) for extinction within 30 years, and ~10% for AI killing all humans within a decade (Sep 2026, interviewer’s framing). None names a mechanism.",chr22:"The same post gives 46% for humanity irreversibly messing up its future within 10 years of powerful AI (tagged mixed; plotted but folded into this row).",amo25:"Earlier: 10–25% (Oct 2023).",aii24g:"Earlier survey waves: 5% (2022), 5% (2023).",aii24c:"Earlier survey waves: 10% (2022), 10% (2023)."};
+
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("chart");
+const W=960,H=470,ml=70,mr=24,mt=24,mb=50;
+const x0=2020,x1=2027,yMin=0.05,yMax=100;
+const X=d=>ml+(d-x0)/(x1-x0)*(W-ml-mr);
+const Y=v=>{const l=Math.log10(Math.max(yMin,Math.min(yMax,v)));return mt+(Math.log10(yMax)-l)/(Math.log10(yMax)-Math.log10(yMin))*(H-mt-mb)};
+const mlab={mis:"Misalignment / loss of control",mixed:"Mixed",und:"⚠ Undetermined"};
+const mcls=m=>m==="mis"?"b-mis":m==="mixed"?"b-mixed":"b-und";
+const tcol=t=>`var(--t-${t})`;
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+
+// grid + axes
+[0.1,0.3,1,3,10,30,100].forEach(v=>{el("line",{x1:ml,x2:W-mr,y1:Y(v),y2:Y(v),stroke:"var(--rule)","stroke-width":1});const t=el("text",{x:ml-8,y:Y(v)+4,"text-anchor":"end"});t.textContent=v+"%"});
+for(let yr=2020;yr<=2027;yr++){el("line",{x1:X(yr),x2:X(yr),y1:mt,y2:H-mb,stroke:"var(--rule)","stroke-width":1,"stroke-dasharray":"2 4"});const t=el("text",{x:X(yr),y:H-mb+20,"text-anchor":"middle"});t.textContent=yr}
+const yl=el("text",{x:16,y:(H-mb+mt)/2,"text-anchor":"middle",transform:`rotate(-90 16 ${(H-mb+mt)/2})`});yl.textContent="Probability (log scale)";
+const xl=el("text",{x:(W+ml)/2,y:H-8,"text-anchor":"middle"});xl.textContent="Date estimate was made";
+
+// jitter coincident points
+const seen={};
+const pts=D.map(r=>{const key=r.d.toFixed(2);const n=seen[key]=(seen[key]||0)+1;return {...r,px:X(r.d)+(n-1)*9-((n>1)?4:0)}});
+const tip=document.getElementById("tip");
+const groups=[];
+pts.forEach(r=>{
+  const g=el("g",{tabindex:"0","data-m":r.m,"data-t":r.t,style:"cursor:pointer;outline:none"});
+  const c=tcol(r.t);
+  if(r.lo!=null){el("line",{x1:r.px,x2:r.px,y1:Y(r.hi),y2:Y(r.lo),stroke:c,"stroke-width":2,opacity:.55},g);
+    [r.lo,r.hi].forEach(v=>el("line",{x1:r.px-4,x2:r.px+4,y1:Y(v),y2:Y(v),stroke:c,"stroke-width":2,opacity:.55},g))}
+  const y=Y(r.v),attrs={fill:c,stroke:"var(--bg)","stroke-width":1.2};
+  if(r.k==="grp")el("rect",{x:r.px-5.5,y:y-5.5,width:11,height:11,...attrs},g);
+  else el("circle",{cx:r.px,cy:y,r:6,...attrs},g);
+  const show=e=>{tip.innerHTML=`<b>${r.lab}</b> · ${r.who}<br>${r.out}<br><span style="display:inline-block;margin-top:6px"><span class="dot${r.k==="grp"?" sq":""}" style="background:${c}"></span>${TY[r.t].s} · ${r.k==="grp"?"survey / group median":"individual"}</span><br><span class="badge ${mcls(r.m)}" style="margin-top:6px">${mlab[r.m]}</span><br><span style="color:var(--muted)">${r.date} · ${r.src}</span>`;tip.hidden=false;place(e)};
+  g.addEventListener("mouseenter",show);g.addEventListener("mousemove",place);g.addEventListener("mouseleave",()=>tip.hidden=true);
+  g.addEventListener("focus",()=>{const b=g.getBoundingClientRect();show({clientX:b.right,clientY:b.top})});g.addEventListener("blur",()=>tip.hidden=true);
+  g.addEventListener("click",e=>{e.stopPropagation();show(e)});
+  groups.push(g);
+});
+document.addEventListener("click",()=>tip.hidden=true);
+function place(e){const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=Math.max(8,x)+"px";tip.style.top=Math.max(8,y)+"px"}
+
+// table: one row per estimate; earlier restatements folded into the latest row
+const tb=document.querySelector("#tbl tbody");
+const rows=[...D].filter(r=>!FOLD[r.id]).sort((a,b)=>a.d-b.d);
+rows.forEach(r=>{
+  const tr=document.createElement("tr");tr.dataset.m=r.m;tr.dataset.t=r.t;
+  const notes=[r.note,HIST[r.id]].filter(Boolean).map(n=>`<span class="note">${n}</span>`).join("");
+  tr.innerHTML=`<td class="date">${r.date}</td><td>${r.who}</td>
+  <td class="srcc"><span class="dot${r.k==="grp"?" sq":""}" style="background:${tcol(r.t)}"></span>${TY[r.t].s}<small>${r.k==="grp"?"survey / group median":"individual"}</small></td>
+  <td class="num">${r.lab}</td><td>${r.out}</td>
+  <td><span class="badge ${mcls(r.m)}">${mlab[r.m]}</span></td>
+  <td>${r.q}${notes}<span class="note"><a href="${r.url}" target="_blank" rel="noopener">${r.src}</a>${r.sec?" · via secondary report":""}</span></td>`;
+  tb.appendChild(tr);
+});
+document.getElementById("rowcount").textContent=`${rows.length} rows. The chart plots ${D.length} estimates: ${D.length-rows.length} earlier or alternative figures from the same source (Carlsmith, Kokotajlo, Hinton, Christiano, Amodei and the 2022–23 AI Impacts survey waves) are plotted but folded into one row here.`;
+
+// filters: mechanism buttons + source-type legend toggles
+const state={m:"all",hide:new Set()};
+function apply(){
+  const ok=(m,t)=>(state.m==="all"||m===state.m)&&!state.hide.has(t);
+  groups.forEach(g=>g.style.opacity=ok(g.dataset.m,g.dataset.t)?1:.08);
+  tb.querySelectorAll("tr").forEach(tr=>tr.classList.toggle("dim",!ok(tr.dataset.m,tr.dataset.t)));
+}
+const btns=[...document.querySelectorAll(".controls button")];
+btns.forEach(b=>b.addEventListener("click",()=>{state.m=b.dataset.f;btns.forEach(x=>x.setAttribute("aria-pressed",x===b));apply()}));
+const lg=document.getElementById("legend");
+Object.keys(TY).forEach(t=>{
+  const n=D.filter(r=>r.t===t).length;
+  const b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed","true");
+  b.innerHTML=`<svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="${tcol(t)}"/></svg>${TY[t].n} <span style="color:var(--muted)">(${n})</span>`;
+  b.addEventListener("click",()=>{state.hide.has(t)?state.hide.delete(t):state.hide.add(t);b.setAttribute("aria-pressed",!state.hide.has(t));apply()});
+  lg.appendChild(b);
+});
+
+// wave 12 detail table
+[["Baseline: all things considered","2%","5.2%","1.6%","5%"],
+ ["International pre-release authorisation","1%","4%","1%","3%"],
+ ["US-only pre-release authorisation","1.5%","–","–","–"],
+ ["US–China capability slowdown","1.2%","–","–","–"],
+ ["US-only capability slowdown","2%","–","–","–"],
+ ["Federal preemption of state AI laws","3%","8%","2.5%","6.9%"],
+ ["Bundle of policies: reduction in risk","−72%","−62%","−56%","−60%"]].forEach((r,i)=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td${i===0?' style="font-weight:600"':""}>${r[0]}</td>`+r.slice(1).map(c=>`<td class="num">${c}</td>`).join("");
+  document.getElementById("w12").appendChild(tr)});
+
+// bibliography (unique sources)
+const bib=document.getElementById("bib");const used=new Set();
+[...D].sort((a,b)=>a.src.localeCompare(b.src)).forEach(r=>{if(used.has(r.url))return;used.add(r.url);
+  const li=document.createElement("li");li.innerHTML=`${r.src}. <a href="${r.url}" target="_blank" rel="noopener">${r.url}</a>`;bib.appendChild(li)});
+[["Cunningham, Forecasts of AI & Economic Growth (format model)","https://tecunningham.github.io/posts/2025-10-19-forecasts-of-AI-growth.html"],
+ ["Virev, Will AI kill us all? (secondary compilation used for several 2025–26 quotes)","https://virev.ai/blog/will-ai-kill-us-all"]].forEach(([s,u])=>{const li=document.createElement("li");li.innerHTML=`${s}. <a href="${u}" target="_blank" rel="noopener">${u}</a>`;bib.appendChild(li)});
+</script>
+
+</body></html>
